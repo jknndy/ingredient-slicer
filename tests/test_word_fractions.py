@@ -9,61 +9,67 @@ from ingredient_slicer import IngredientSlicer
 # ---- Test IngredientSlicer: Fraction words tests ----
 # -------------------------------------------------------------------------------
 
+
 def test_fraction_words_1():
     parse = IngredientSlicer("two thirds a cups of flour")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed['quantity'] == "0.666"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == "cup"
+    assert parsed["quantity"] == "0.666"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
+    assert parsed["is_required"] == True
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'flour'
-    assert parsed['size_modifiers'] == []
+    assert parsed["prep"] == []
+    assert parsed["food"] == "flour"
+    assert parsed["size_modifiers"] == []
+
 
 def test_fraction_words_2():
     parse = IngredientSlicer("two and two thirds cups of flour")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed['quantity'] == "2.666"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == "cup"
+    assert parsed["quantity"] == "2.666"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
+    assert parsed["is_required"] == True
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'flour'
-    assert parsed['size_modifiers'] == []
+    assert parsed["prep"] == []
+    assert parsed["food"] == "flour"
+    assert parsed["size_modifiers"] == []
 
 
 def test_fraction_words_3():
-    parse = IngredientSlicer("two and two thirds or 1 and 3 quarters cups of flour", debug = False)
+    parse = IngredientSlicer(
+        "two and two thirds or 1 and 3 quarters cups of flour", debug=False
+    )
     # parse.parse()
     parsed = parse.to_json()
-    
-    assert parsed['quantity'] == "2.208"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["quantity"] == "2.208"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['is_required'] == True
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'flour'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+
+    assert parsed["prep"] == []
+    assert parsed["food"] == "flour"
+    assert parsed["size_modifiers"] == []
+
+
 ######################
 # IngredientSlicer.regex.PREP_WORDS_PATTERN.findall("3 tablespoons unsalted butter, softened at room temperature")
 # IngredientSlicer.regex.print_matches("3 tablespoons unsalted butter, softened at room temperature")
@@ -77,10 +83,10 @@ def test_fraction_words_3():
 # # IngredientSlicer.regex.constants["FRACTION_WORDS"]
 
 # IngredientSlicer.regex.print_matches(ingredient)
-    
+
 ##############################################################################################################
 ##############################################################################################################
-    
+
 # # ingredient = "3 and 2thirds cups of milk or 1 and 3 quarters tbs of lemon juice"
 # ingredient = "I love a 3 and 2thirds cups of milk"
 # # ingredient = " 2thirds cups of milk"
@@ -107,7 +113,7 @@ def test_fraction_words_3():
 #     # split_by_fraction_word = ingredient.split(match.group(0))
 #     # if not split_by_fraction_word[0].strip():
 #     #     print(f"No strings before fraction word")
-#     # strings_before_fraction_word = split_by_fraction_word[0].strip().split(" ") 
+#     # strings_before_fraction_word = split_by_fraction_word[0].strip().split(" ")
 #     # more_than_one_word = len(strings_before_fraction_word) > 1
 #     # if more_than_one_word:
 #     #     maybe_and = strings_before_fraction_word[-1]
@@ -139,7 +145,7 @@ def test_fraction_words_3():
 
 # for match in add_pattern_iter:
 #     match_string = match.group(0)
-    
+
 #     print(match)
 #     print(match.start())
 #     print(match.end())
@@ -198,5 +204,5 @@ def test_fraction_words_3():
 #         self.standard_ingredient = self.standard_ingredient[:match.start()] + str(updated_value) + self.standard_ingredient[match.end():]
 
 #         offset += len(updated_value) - (end - start)
-    
-#     return 
+
+#     return

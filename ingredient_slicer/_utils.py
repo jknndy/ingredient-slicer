@@ -1,5 +1,3 @@
-
-
 from fractions import Fraction
 from html import unescape
 import re
@@ -12,129 +10,145 @@ from ingredient_slicer import _constants, _regex_patterns
 # ---- Utility functions for handling numbers, decimals, and fractions in strings ----
 # -----------------------------------------------------------------------------------------------
 
+
 def _make_int_or_float_str(number_str: str) -> str:
-        """ Convert a string representation of a number to its integer or float equivalent.
-        If the number is a whole number, return the integer value as a string. If the number is a decimal, return the float value as a string.
-        Args:
-            number_str (str): The string representation of the number.
-        Returns:
-            str: The integer or float value of the number as a string.
-        
-        Examples:
-        >>> make_int_or_float_str("1.0") 
-        "1"
-        >>> make_int_or_float_str("1")
-        "1"
-        >>> make_int_or_float_str("0.25")
-        "0.25"
-        """
+    """Convert a string representation of a number to its integer or float equivalent.
+    If the number is a whole number, return the integer value as a string. If the number is a decimal, return the float value as a string.
+    Args:
+        number_str (str): The string representation of the number.
+    Returns:
+        str: The integer or float value of the number as a string.
 
-        # convert integer/float to string if it's not already a string
-        if isinstance(number_str, (int, float)):
-            number_str = str(number_str)
+    Examples:
+    >>> make_int_or_float_str("1.0")
+    "1"
+    >>> make_int_or_float_str("1")
+    "1"
+    >>> make_int_or_float_str("0.25")
+    "0.25"
+    """
 
-        number_str = number_str.replace(" ", "")
+    # convert integer/float to string if it's not already a string
+    if isinstance(number_str, (int, float)):
+        number_str = str(number_str)
 
-        # # NOTE: remove negative sign if it exists and replace whitespace
-        # is_negative = False
-        # if number_str[0] == "-":
-        #     is_negative = True
-        #     number_str = number_str[1:]
-        #     number_str = number_str.replace(" ", "")
+    number_str = number_str.replace(" ", "")
 
-        period_count = 0
+    # # NOTE: remove negative sign if it exists and replace whitespace
+    # is_negative = False
+    # if number_str[0] == "-":
+    #     is_negative = True
+    #     number_str = number_str[1:]
+    #     number_str = number_str.replace(" ", "")
 
-        for i in number_str:
-            if i == ".":
-                period_count += 1
-            if not i.isdigit() and i != ".":
-                raise ValueError("Invalid character in number. Only digits and periods are allowed.")
-            
-        if period_count > 1:
-            raise ValueError("Invalid number format. Only one period is allowed in a number.")
-        
-        number = float(number_str.strip())  # Convert string to float
+    period_count = 0
 
-        if number == int(number):  # Check if float is equal to its integer value
+    for i in number_str:
+        if i == ".":
+            period_count += 1
+        if not i.isdigit() and i != ".":
+            raise ValueError(
+                "Invalid character in number. Only digits and periods are allowed."
+            )
 
-            # f"-{str(int(number))}" if is_negative else str(int(number))
+    if period_count > 1:
+        raise ValueError(
+            "Invalid number format. Only one period is allowed in a number."
+        )
 
-            return str(int(number))  # Return integer value if it's a whole number
-        else:
-            # f"-{str(number)}" if is_negative else str(number)
+    number = float(number_str.strip())  # Convert string to float
 
-            return str(number)  # Return float if it's a decimal
+    if number == int(number):  # Check if float is equal to its integer value
+
+        # f"-{str(int(number))}" if is_negative else str(int(number))
+
+        return str(int(number))  # Return integer value if it's a whole number
+    else:
+        # f"-{str(number)}" if is_negative else str(number)
+
+        return str(number)  # Return float if it's a decimal
+
 
 # -----------------------------------------------------------------------------------------------
 # ---- Convert a string fraction to a decimal (i.e. "1/2" -> "0.5") ----
 # -----------------------------------------------------------------------------------------------
 
+
 def _fraction_str_to_decimal(fraction_str: str) -> str:
-        """
-        Convert a string representation of a fraction to its decimal equivalent.
-        Args:
-            fraction_str (str): The string representation of the fraction. Must only contain digits, a forward slash, and possible whitespace. 
-                                    Numbers must be separated by a forward slash. If a whole number string or a decimal string is passed, it will be returned as a string, 
-                                    and converted to a whole number if values after the decimal point are only zeros (i.e. 1.0 -> 1, 2.0 -> 2, 3.00 -> 3).
-        Returns:
-            str: The decimal value of the fraction as a string. 
-        """
-        # FRACTION_PATTERN2 = re.compile(r'\d+(?:\.\d+|/\d+)')
+    """
+    Convert a string representation of a fraction to its decimal equivalent.
+    Args:
+        fraction_str (str): The string representation of the fraction. Must only contain digits, a forward slash, and possible whitespace.
+                                Numbers must be separated by a forward slash. If a whole number string or a decimal string is passed, it will be returned as a string,
+                                and converted to a whole number if values after the decimal point are only zeros (i.e. 1.0 -> 1, 2.0 -> 2, 3.00 -> 3).
+    Returns:
+        str: The decimal value of the fraction as a string.
+    """
+    # FRACTION_PATTERN2 = re.compile(r'\d+(?:\.\d+|/\d+)')
 
-        # fraction_str = "4/0.48"
-        # fraction_str = "4/0.48"
-        # FRACTION_PATTERN2.findall(fraction_str)
-        # 4/0.48
+    # fraction_str = "4/0.48"
+    # fraction_str = "4/0.48"
+    # FRACTION_PATTERN2.findall(fraction_str)
+    # 4/0.48
 
-        if not isinstance(fraction_str, str):
-            raise ValueError("Invalid input. Fraction string must be a string.")
+    if not isinstance(fraction_str, str):
+        raise ValueError("Invalid input. Fraction string must be a string.")
 
-        # Split the fraction string into its numerator and denominator
-        split_fraction = [i.strip() for i in fraction_str.split("/")]
-        # print(f"Split Fraction: {split_fraction}") if self.debug else None
+    # Split the fraction string into its numerator and denominator
+    split_fraction = [i.strip() for i in fraction_str.split("/")]
+    # print(f"Split Fraction: {split_fraction}") if self.debug else None
 
-        # If the fraction is a whole number, return the number
-        if len(split_fraction) == 1:
-            # print(f"---> Only one part: {split_fraction[0]}")
+    # If the fraction is a whole number, return the number
+    if len(split_fraction) == 1:
+        # print(f"---> Only one part: {split_fraction[0]}")
 
-            converted_number = _make_int_or_float_str(split_fraction[0])
+        converted_number = _make_int_or_float_str(split_fraction[0])
 
-            # print(f"---> OLD Output: {round(float(split_fraction[0]), 3)}")
-            # print(f"---> NEW Output: {converted_number}")
-            return converted_number
-        
-        # after returning cases of just a whole number or decimal number and returning that, 
-        # we make sure all of our characters are valid 
-        has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " ", "."} for i in fraction_str])
-        # has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " "} for i in fraction_str])
+        # print(f"---> OLD Output: {round(float(split_fraction[0]), 3)}")
+        # print(f"---> NEW Output: {converted_number}")
+        return converted_number
 
-        if not has_only_valid_chars:
-            raise ValueError("Invalid input. Fraction string must contain only digits, hyphens, and a forward slash (possible invalid characters and/or periods?)")
+    # after returning cases of just a whole number or decimal number and returning that,
+    # we make sure all of our characters are valid
+    has_only_valid_chars = all(
+        [i.isdigit() or i in {"-", "/", " ", "."} for i in fraction_str]
+    )
+    # has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " "} for i in fraction_str])
 
-        # # numerator = int(split_fraction[0])
-        # # denominator = int(split_fraction[1])
-        # numerator = int(float(split_fraction[0])) # TODO: This is being tested out
-        # denominator = int(float(split_fraction[1]))
-        # is_negative = True if (numerator < 0 and denominator >= 0) or (numerator >= 0 and denominator < 0) else False
+    if not has_only_valid_chars:
+        raise ValueError(
+            "Invalid input. Fraction string must contain only digits, hyphens, and a forward slash (possible invalid characters and/or periods?)"
+        )
 
-        # Convert the fraction to a decimal
-        # return round(float(Fraction(numerator, denominator)), 3)
+    # # numerator = int(split_fraction[0])
+    # # denominator = int(split_fraction[1])
+    # numerator = int(float(split_fraction[0])) # TODO: This is being tested out
+    # denominator = int(float(split_fraction[1]))
+    # is_negative = True if (numerator < 0 and denominator >= 0) or (numerator >= 0 and denominator < 0) else False
 
-        # decimal_value = round(float(Fraction(numerator, denominator)), 3)
-        
-        # converts the split up fraction list to a float
-        decimal_value = round(_split_fraction_to_float(split_fraction), 3)
+    # Convert the fraction to a decimal
+    # return round(float(Fraction(numerator, denominator)), 3)
 
-        is_negative   = True if decimal_value < 0 else False
+    # decimal_value = round(float(Fraction(numerator, denominator)), 3)
 
-        if is_negative:
-            decimal_value = decimal_value * -1
-            # decimal_value = decimal_value.replace("-", "")
-        
-        decimal_str = f"-{_make_int_or_float_str(str(decimal_value))}" if is_negative else _make_int_or_float_str(str(decimal_value))
+    # converts the split up fraction list to a float
+    decimal_value = round(_split_fraction_to_float(split_fraction), 3)
 
-        # return _make_int_or_float_str(str(round(float(Fraction(numerator, denominator)), 3)))
-        return decimal_str
+    is_negative = True if decimal_value < 0 else False
+
+    if is_negative:
+        decimal_value = decimal_value * -1
+        # decimal_value = decimal_value.replace("-", "")
+
+    decimal_str = (
+        f"-{_make_int_or_float_str(str(decimal_value))}"
+        if is_negative
+        else _make_int_or_float_str(str(decimal_value))
+    )
+
+    # return _make_int_or_float_str(str(round(float(Fraction(numerator, denominator)), 3)))
+    return decimal_str
+
 
 def _split_fraction_to_float(split_fraction: list) -> float:
     """
@@ -145,66 +159,80 @@ def _split_fraction_to_float(split_fraction: list) -> float:
         float: The float value of the fraction.
     """
 
-    numerator_fraction =  Fraction(split_fraction[0])
+    numerator_fraction = Fraction(split_fraction[0])
     denominator_fraction = Fraction(split_fraction[1])
 
     return float(Fraction(numerator_fraction, denominator_fraction))
 
+
 # TODO: Delete/Deprecated, this is the old version of the _fraction_str_to_decimal function above
 def _fraction_str_to_decimal2(fraction_str: str) -> str:
-        """
-        Convert a string representation of a fraction to its decimal equivalent.
-        Args:
-            fraction_str (str): The string representation of the fraction. Must only contain digits, a forward slash, and possible whitespace. 
-                                    Numbers must be separated by a forward slash. If a whole number string or a decimal string is passed, it will be returned as a string, 
-                                    and converted to a whole number if values after the decimal point are only zeros (i.e. 1.0 -> 1, 2.0 -> 2, 3.00 -> 3).
-        Returns:
-            str: The decimal value of the fraction as a string. 
-        """
-        
-        if not isinstance(fraction_str, str):
-            raise ValueError("Invalid input. Fraction string must be a string.")
+    """
+    Convert a string representation of a fraction to its decimal equivalent.
+    Args:
+        fraction_str (str): The string representation of the fraction. Must only contain digits, a forward slash, and possible whitespace.
+                                Numbers must be separated by a forward slash. If a whole number string or a decimal string is passed, it will be returned as a string,
+                                and converted to a whole number if values after the decimal point are only zeros (i.e. 1.0 -> 1, 2.0 -> 2, 3.00 -> 3).
+    Returns:
+        str: The decimal value of the fraction as a string.
+    """
 
-        # Split the fraction string into its numerator and denominator
-        split_fraction = [i.strip() for i in fraction_str.split("/")]
-        # print(f"Split Fraction: {split_fraction}") if self.debug else None
+    if not isinstance(fraction_str, str):
+        raise ValueError("Invalid input. Fraction string must be a string.")
 
-        # If the fraction is a whole number, return the number
-        if len(split_fraction) == 1:
-            converted_number = _make_int_or_float_str(split_fraction[0])
-            return converted_number
-        
-        # remove trailing period if it exists
-        if split_fraction[1][-1] == ".":
-            split_fraction[1] = split_fraction[1][:-1]
+    # Split the fraction string into its numerator and denominator
+    split_fraction = [i.strip() for i in fraction_str.split("/")]
+    # print(f"Split Fraction: {split_fraction}") if self.debug else None
 
-        # after returning cases of just a whole number or decimal number and returning that, 
-        # we make sure all of our characters are valid 
-        has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " ", "."} for i in fraction_str])
-        # has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " "} for i in fraction_str])
+    # If the fraction is a whole number, return the number
+    if len(split_fraction) == 1:
+        converted_number = _make_int_or_float_str(split_fraction[0])
+        return converted_number
 
-        if not has_only_valid_chars:
-            raise ValueError("Invalid input. Fraction string must contain only digits, hyphens, and a forward slash (possible invalid characters and/or periods?)")
+    # remove trailing period if it exists
+    if split_fraction[1][-1] == ".":
+        split_fraction[1] = split_fraction[1][:-1]
 
-        numerator = int(split_fraction[0])
-        denominator = int(split_fraction[1])
-        # numerator = int(float(split_fraction[0])) # TODO: This is being tested out
-        # denominator = int(float(split_fraction[1]))
+    # after returning cases of just a whole number or decimal number and returning that,
+    # we make sure all of our characters are valid
+    has_only_valid_chars = all(
+        [i.isdigit() or i in {"-", "/", " ", "."} for i in fraction_str]
+    )
+    # has_only_valid_chars = all([i.isdigit() or i in {"-", "/", " "} for i in fraction_str])
 
-        is_negative = True if (numerator < 0 and denominator >= 0) or (numerator >= 0 and denominator < 0) else False
+    if not has_only_valid_chars:
+        raise ValueError(
+            "Invalid input. Fraction string must contain only digits, hyphens, and a forward slash (possible invalid characters and/or periods?)"
+        )
 
-        # Convert the fraction to a decimal
-        # return round(float(Fraction(numerator, denominator)), 3)
-        decimal_value = round(float(Fraction(numerator, denominator)), 3)
+    numerator = int(split_fraction[0])
+    denominator = int(split_fraction[1])
+    # numerator = int(float(split_fraction[0])) # TODO: This is being tested out
+    # denominator = int(float(split_fraction[1]))
 
-        if is_negative:
-            decimal_value = decimal_value * -1
-            # decimal_value = decimal_value.replace("-", "")
-        
-        decimal_str = f"-{_make_int_or_float_str(str(decimal_value))}" if is_negative else _make_int_or_float_str(str(decimal_value))
+    is_negative = (
+        True
+        if (numerator < 0 and denominator >= 0) or (numerator >= 0 and denominator < 0)
+        else False
+    )
 
-        # return _make_int_or_float_str(str(round(float(Fraction(numerator, denominator)), 3)))
-        return decimal_str
+    # Convert the fraction to a decimal
+    # return round(float(Fraction(numerator, denominator)), 3)
+    decimal_value = round(float(Fraction(numerator, denominator)), 3)
+
+    if is_negative:
+        decimal_value = decimal_value * -1
+        # decimal_value = decimal_value.replace("-", "")
+
+    decimal_str = (
+        f"-{_make_int_or_float_str(str(decimal_value))}"
+        if is_negative
+        else _make_int_or_float_str(str(decimal_value))
+    )
+
+    # return _make_int_or_float_str(str(round(float(Fraction(numerator, denominator)), 3)))
+    return decimal_str
+
 
 # -----------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------
@@ -213,51 +241,57 @@ def _fraction_str_to_decimal2(fraction_str: str) -> str:
 # ---- Convert ALL fractions in a string to their decimal equivalent ----
 # -----------------------------------------------------------------------------------------------
 
+
 # TODO: Replace the _convert_fractions_to_decimals function defined in the IngredientSlicer class with this version
 # NOTE: This is the NEW implementation of _convert_fractions_to_decimals and specifically deals with each fraction type
 # NOTE: in a specific order and with a specific regex pattern to ensure the most accurate conversion
 def _convert_fractions_to_decimals(ingredient: str) -> list:
-        """
-        Find all fractions in the parsed ingredient string.
-        Args:
-            ingredient (str): The ingredient string to parse.
-        Returns:
-            list: A list of all fractions found in the ingredient string.
-        """
+    """
+    Find all fractions in the parsed ingredient string.
+    Args:
+        ingredient (str): The ingredient string to parse.
+    Returns:
+        list: A list of all fractions found in the ingredient string.
+    """
 
-        if not isinstance(ingredient, str):
-            raise ValueError("Invalid input. Ingredient must be a string.")
+    if not isinstance(ingredient, str):
+        raise ValueError("Invalid input. Ingredient must be a string.")
 
-        # use the predefined order of FRACTION_TYPE_ORDER to iterate through the patterns in 
-        # an order that will allow for the most accurate conversion (deals with decimal fractions first if they exist)
-        for pattern_key in _regex_patterns.FRACTION_TYPE_ORDER:
+    # use the predefined order of FRACTION_TYPE_ORDER to iterate through the patterns in
+    # an order that will allow for the most accurate conversion (deals with decimal fractions first if they exist)
+    for pattern_key in _regex_patterns.FRACTION_TYPE_ORDER:
         # for key, pattern in _regex_patterns.FRACTION_TYPE_MAP.items():
         # # for key, pattern in list(_regex_patterns.FRACTION_TYPE_MAP.items())[::-1]:
-            pattern = _regex_patterns.FRACTION_TYPE_MAP[pattern_key]
+        pattern = _regex_patterns.FRACTION_TYPE_MAP[pattern_key]
 
-            # match_fraction = pattern.findall(ingredient)
-            match_fraction_iter = pattern.finditer(ingredient)
+        # match_fraction = pattern.findall(ingredient)
+        match_fraction_iter = pattern.finditer(ingredient)
 
-            offset = 0
+        offset = 0
 
-            for match in match_fraction_iter:
-                match_string    = match.group()
-                start, end = match.start(), match.end()
-                modified_start = start + offset
-                modified_end = end + offset
+        for match in match_fraction_iter:
+            match_string = match.group()
+            start, end = match.start(), match.end()
+            modified_start = start + offset
+            modified_end = end + offset
 
-                fraction_decimal = _fraction_str_to_decimal(match_string)
+            fraction_decimal = _fraction_str_to_decimal(match_string)
 
-                ingredient = ingredient[:modified_start] + str(fraction_decimal) + ingredient[modified_end:]
-                offset += len(str(fraction_decimal)) - (end - start)
+            ingredient = (
+                ingredient[:modified_start]
+                + str(fraction_decimal)
+                + ingredient[modified_end:]
+            )
+            offset += len(str(fraction_decimal)) - (end - start)
 
-        # # NOTE: trying the second loop implementation below will show why the order matters 
-        # for key, pattern in _regex_patterns.FRACTION_TYPE_MAP.items():
-        # # for key, pattern in list(_regex_patterns.FRACTION_TYPE_MAP.items())[::-1]: # NOTE: SHOWS WHY ORDER MATTERS
+    # # NOTE: trying the second loop implementation below will show why the order matters
+    # for key, pattern in _regex_patterns.FRACTION_TYPE_MAP.items():
+    # # for key, pattern in list(_regex_patterns.FRACTION_TYPE_MAP.items())[::-1]: # NOTE: SHOWS WHY ORDER MATTERS
 
-        return ingredient
+    return ingredient
 
-# # NOTE: Old implementation of _convert_fractions_to_decimals 
+
+# # NOTE: Old implementation of _convert_fractions_to_decimals
 # # NOTE: (this is roughly what was used in the IngredientSlicer class, relies mainly on correct matching from the FRACTION_PATTERN)
 # def _convert_fractions_to_decimals2(ingredient: str) -> str:
 #     """
@@ -282,19 +316,19 @@ def _convert_fractions_to_decimals(ingredient: str) -> list:
 # ---- Force whitespaces between an number followed by a character or vice versa (i.e. "1cup" -> "1 cup") ----
 # -----------------------------------------------------------------------------------------------------------------------
 
+
 def _force_ws_between_numbers_and_chars(ingredient: str) -> str:
-    
     """Forces spaces between numbers and units and between units and numbers.
     End result is a string with a space between numbers and units and between units and numbers.
     Examples:
     "1cup" becomes "1 cup"
-    "cup1" becomes "cup 1" 
+    "cup1" becomes "cup 1"
     and ultimately "1cup" becomes "1 - cup" and "cup1" becomes "cup - 1"
     """
 
     NUMBERS_TO_LETTERS = re.compile(r"(\d)\-?([a-zA-Z])")  # 1cup
-    LETTERS_TO_NUMBERS = re.compile(r"([a-zA-Z])(\d)")     # cup1
-    LETTERS_DASH_NUMBERS = re.compile(r"([a-zA-Z])\-(\d)") # cup - 1
+    LETTERS_TO_NUMBERS = re.compile(r"([a-zA-Z])(\d)")  # cup1
+    LETTERS_DASH_NUMBERS = re.compile(r"([a-zA-Z])\-(\d)")  # cup - 1
 
     ingredient = NUMBERS_TO_LETTERS.sub(r"\1 \2", ingredient)
     ingredient = LETTERS_TO_NUMBERS.sub(r"\1 \2", ingredient)
@@ -302,56 +336,67 @@ def _force_ws_between_numbers_and_chars(ingredient: str) -> str:
 
     return ingredient
 
+
 # -----------------------------------------------------------------------------------------------
 # ---- Standardize ranges (numbers separated by "-") so they all are the same form ----
 # -----------------------------------------------------------------------------------------------
 
+
 def _update_ranges(ingredient: str, pattern: re.Pattern) -> str:
-        """Update the number ranges in the ingredient string to always have two numbers separated by a whitespace, then a hyphen, then another whitespace.
-        Notes: Currently supports the following patterns in the IngredientTools class:
-            - QUANTITY_DASH_QUANTITY
-            - BETWEEN_QUANTITY_AND_QUANTITY
-            - QUANTITY_TO_QUANTITY
-            - QUANTITY_OR_QUANTITY
-        Args:
-            ingredient (str): The ingredient string to update
-            pattern (re.Pattern): The pattern to use to find the ranges
-        Returns:
-            str: The updated ingredient string with all possible ranges updated to always 
-                have 2 numbers separated by a whitespace, then a hyphen, then another whitespace.
-        """
+    """Update the number ranges in the ingredient string to always have two numbers separated by a whitespace, then a hyphen, then another whitespace.
+    Notes: Currently supports the following patterns in the IngredientTools class:
+        - QUANTITY_DASH_QUANTITY
+        - BETWEEN_QUANTITY_AND_QUANTITY
+        - QUANTITY_TO_QUANTITY
+        - QUANTITY_OR_QUANTITY
+    Args:
+        ingredient (str): The ingredient string to update
+        pattern (re.Pattern): The pattern to use to find the ranges
+    Returns:
+        str: The updated ingredient string with all possible ranges updated to always
+            have 2 numbers separated by a whitespace, then a hyphen, then another whitespace.
+    """
 
-        matched_ranges_iter = pattern.finditer(ingredient)
-        offset = 0
+    matched_ranges_iter = pattern.finditer(ingredient)
+    offset = 0
 
-        for match in matched_ranges_iter:
-            start, end = match.start(), match.end()
-            modified_start = start + offset  # new start position
-            modified_end = end + offset      # new end position
-            match_string = match.group()
+    for match in matched_ranges_iter:
+        start, end = match.start(), match.end()
+        modified_start = start + offset  # new start position
+        modified_end = end + offset  # new end position
+        match_string = match.group()
 
-            # In the match string, replace all instances of "and", "&", "to", and "or" with hyphens
-            match_string = match_string.replace("and", "-") \
-                .replace("&", "-") \
-                .replace("to", "-") \
-                .replace("or", "-") \
-                .replace("between", "").strip()
-            
-            updated_range = " - ".join([str(_fraction_str_to_decimal(i)) for i in match_string.split("-")])
+        # In the match string, replace all instances of "and", "&", "to", and "or" with hyphens
+        match_string = (
+            match_string.replace("and", "-")
+            .replace("&", "-")
+            .replace("to", "-")
+            .replace("or", "-")
+            .replace("between", "")
+            .strip()
+        )
 
-            ingredient = ingredient[:modified_start] + updated_range + ingredient[modified_end:]
+        updated_range = " - ".join(
+            [str(_fraction_str_to_decimal(i)) for i in match_string.split("-")]
+        )
 
-            # # Update the offset for subsequent replacements
-            offset += len(str(updated_range)) - (end - start)
-            
-        return ingredient
+        ingredient = (
+            ingredient[:modified_start] + updated_range + ingredient[modified_end:]
+        )
+
+        # # Update the offset for subsequent replacements
+        offset += len(str(updated_range)) - (end - start)
+
+    return ingredient
+
 
 # -----------------------------------------------------------------------------------------------
 # ---- Merge/Fix any ranges that are not really ranges (i.e. "4-1/2" -> "4.5")
 # -----------------------------------------------------------------------------------------------
 
-def _merge_misleading_ranges(ingredient:str) -> str:
-    """ Merge misleading ranges in the parsed ingredient (i.e. "4-1/2" is not a valid range, it should be "4.5" instead)"""
+
+def _merge_misleading_ranges(ingredient: str) -> str:
+    """Merge misleading ranges in the parsed ingredient (i.e. "4-1/2" is not a valid range, it should be "4.5" instead)"""
 
     # Find all the ranges in the ingredient
     range_iter = _regex_patterns.QUANTITY_DASH_QUANTITY_GROUPS.finditer(ingredient)
@@ -359,7 +404,7 @@ def _merge_misleading_ranges(ingredient:str) -> str:
     offset = 0
 
     for match in range_iter:
-        match_string    = match.group()
+        match_string = match.group()
         start, end = match.start(), match.end()
         modified_start = start + offset
         modified_end = end + offset
@@ -367,7 +412,7 @@ def _merge_misleading_ranges(ingredient:str) -> str:
         left_range = match.group(1).strip()
         right_range = match.group(2).strip()
 
-        first_number  = float(_fraction_str_to_decimal(left_range).strip())
+        first_number = float(_fraction_str_to_decimal(left_range).strip())
         second_number = float(_fraction_str_to_decimal(right_range).strip())
 
         # If the second number is less than the first number, then the range is misleading
@@ -379,11 +424,17 @@ def _merge_misleading_ranges(ingredient:str) -> str:
 
             # print(f"Second number is a fraction: {second_number_is_fraction}\n > '{multiply_or_add_str}' {first_number} and {second_number}") if self.debug else None
 
-            updated_value = f" {_make_int_or_float_str(str(first_number + second_number))} " if second_number_is_fraction else f" {_make_int_or_float_str(str(first_number * second_number))} "
+            updated_value = (
+                f" {_make_int_or_float_str(str(first_number + second_number))} "
+                if second_number_is_fraction
+                else f" {_make_int_or_float_str(str(first_number * second_number))} "
+            )
             # updated_value = f" {_make_int_or_float_str(str(first_number + second_number))} "
             # print(f"Fixing misleading range: {match_string} with {updated_value}") if self.debug else None
-            
-            ingredient = ingredient[:modified_start] + updated_value + ingredient[modified_end:]
+
+            ingredient = (
+                ingredient[:modified_start] + updated_value + ingredient[modified_end:]
+            )
             offset += len(updated_value) - (end - start)
 
             # print(f"Ingredient after updating: {ingredient}") if self.debug else None
@@ -392,9 +443,11 @@ def _merge_misleading_ranges(ingredient:str) -> str:
 
     return ingredient
 
+
 # -----------------------------------------------------------------------------------------------
 # ---- Collapse ranges of numbers by averaging the values in the range ----
 # -----------------------------------------------------------------------------------------------
+
 
 def avg_ranges(ingredient: str) -> str:
     """
@@ -410,12 +463,12 @@ def avg_ranges(ingredient: str) -> str:
     # regex_patterns = _regex_patterns.IngredientTools()
 
     search_ranges = _regex_patterns.QUANTITY_DASH_QUANTITY.search(ingredient)
-    
+
     while search_ranges:
         start, end = search_ranges.start(), search_ranges.end()
         match_string = search_ranges.group()
         match_string = search_ranges.group()
-            
+
         left_range, right_range = match_string.split("-")
 
         left_range = left_range.strip()
@@ -424,63 +477,66 @@ def avg_ranges(ingredient: str) -> str:
 
         first_number = float(_fraction_str_to_decimal(left_range))
         second_number = float(_fraction_str_to_decimal(right_range))
-        
+
         range_average = _make_int_or_float_str(str((first_number + second_number) / 2))
-        
+
         ingredient = ingredient[:start] + range_average + ingredient[end:]
-        
+
         search_ranges = _regex_patterns.QUANTITY_DASH_QUANTITY.search(ingredient)
-    
+
     ingredient = ingredient.strip()
-    
+
     return ingredient
+
 
 # -----------------------------------------------------------------------------------------------
 # ---- Replace leading "a" and "an" words if no quantities given ----
 # -----------------------------------------------------------------------------------------------
 
+
 def _replace_a_or_an_quantities(ingredient: str) -> str:
-        """
-        Replace "a" or "an" with "1" in the parsed ingredient if no number is present in the ingredient string.
-        Args:
-            ingredient (str): The ingredient string to parse.
-        Returns:
-            str: The updated ingredient string with "a" or "an" replaced with "1" if no other quantites are found.
-        """
+    """
+    Replace "a" or "an" with "1" in the parsed ingredient if no number is present in the ingredient string.
+    Args:
+        ingredient (str): The ingredient string to parse.
+    Returns:
+        str: The updated ingredient string with "a" or "an" replaced with "1" if no other quantites are found.
+    """
 
-        if not isinstance(ingredient, str):
-            raise ValueError("Invalid input. Ingredient must be a string.")
+    if not isinstance(ingredient, str):
+        raise ValueError("Invalid input. Ingredient must be a string.")
 
-        # lowercase and split the ingredient string
-        ingredient       = ingredient.lower()
-        split_ingredient = ingredient.split()
+    # lowercase and split the ingredient string
+    ingredient = ingredient.lower()
+    split_ingredient = ingredient.split()
 
-        quantity_matches = re.findall(_regex_patterns.ALL_NUMBERS, ingredient)
+    quantity_matches = re.findall(_regex_patterns.ALL_NUMBERS, ingredient)
 
-        # if no quantities are found in the ingredient string, 
-        # look for and replace the first "a" or "an" with "1"
-        if not quantity_matches:
-            
-            # go and replace the first "a" or "an" with "1"
-            for index, word in enumerate(split_ingredient):
-                if set(word) == {"a"} or word == "an":
-                    split_ingredient[index] = "1"
-                    ingredient = " ".join(split_ingredient)
-                    break
+    # if no quantities are found in the ingredient string,
+    # look for and replace the first "a" or "an" with "1"
+    if not quantity_matches:
 
-        # if (set(split_ingredient[0]) == {"a"} or split_ingredient[0] == "an") and not quantity_matches:
-        #     split_ingredient[0] = "1"
-        #     # ingredient = " ".join(split_ingredient)
-        #     ingredient = " ".join(split_ingredient)
+        # go and replace the first "a" or "an" with "1"
+        for index, word in enumerate(split_ingredient):
+            if set(word) == {"a"} or word == "an":
+                split_ingredient[index] = "1"
+                ingredient = " ".join(split_ingredient)
+                break
 
-        return ingredient
+    # if (set(split_ingredient[0]) == {"a"} or split_ingredient[0] == "an") and not quantity_matches:
+    #     split_ingredient[0] = "1"
+    #     # ingredient = " ".join(split_ingredient)
+    #     ingredient = " ".join(split_ingredient)
+
+    return ingredient
+
 
 # -----------------------------------------------------------------------------------------------
 # ---- Substring finder and substring hyphen finder functions ----
 # -----------------------------------------------------------------------------------------------
 
-def _find_substring_indices(text: str, substring: str) -> list:
 
+def _find_substring_indices(text: str, substring: str) -> list:
     """Find the start and end indices of a substring in a string
     Case insensitive, and will return all instances of the substring in the text string
     Args:
@@ -503,11 +559,11 @@ def _find_substring_indices(text: str, substring: str) -> list:
             if text[L:R] == substring:
                 substring_indices.append([L, R])
             L += 1
-            
+
     return substring_indices
 
-def _find_and_remove_hyphens_around_substring(text: str, substring: str) -> str:
 
+def _find_and_remove_hyphens_around_substring(text: str, substring: str) -> str:
     """Find instances of a substring surrounded by some number of hyphens on the left or right of the substring and remove these hyphens
     Case insensitive, and will return the updated string with the hyphens removed from around the substring and in lower case
     Args:
@@ -536,19 +592,29 @@ def _find_and_remove_hyphens_around_substring(text: str, substring: str) -> str:
             # print(f"Found window the size of substring!") if debug else None
             if text[L:R] == substring:
                 substring_indices.append([L, R])
-                
+
                 has_left_hyphen = False
                 has_right_hyphen = False
 
                 char_to_left = text[L - 1] if L - 1 >= 0 else None
                 char_to_right = text[R] if R < len(text) else None
-                
-                # character to the left or right of the substring is 
-                # a digit, hyphen, or whitespace or is at the beginning/end of the string
-                valid_left_char  = char_to_left is None or char_to_left.isdigit() or char_to_left == "-" or char_to_left == " "
-                valid_right_char = char_to_right is None or char_to_right.isdigit() or char_to_right == "-" or char_to_right == " "
 
-                # character to the left or right of the substring is NOT a digit, hyphen, or whitespace 
+                # character to the left or right of the substring is
+                # a digit, hyphen, or whitespace or is at the beginning/end of the string
+                valid_left_char = (
+                    char_to_left is None
+                    or char_to_left.isdigit()
+                    or char_to_left == "-"
+                    or char_to_left == " "
+                )
+                valid_right_char = (
+                    char_to_right is None
+                    or char_to_right.isdigit()
+                    or char_to_right == "-"
+                    or char_to_right == " "
+                )
+
+                # character to the left or right of the substring is NOT a digit, hyphen, or whitespace
                 # (i.e. the matched substring is part of a larger word)
                 if not valid_left_char or not valid_right_char:
                     L += 1
@@ -558,73 +624,85 @@ def _find_and_remove_hyphens_around_substring(text: str, substring: str) -> str:
                 GO_LEFT_INDEX = L - 1
 
                 # print(f"Try to go LEFT of '{substring}' substring") if debug else None
-                while GO_LEFT_INDEX >= 0 and (text[GO_LEFT_INDEX] == " " or text[GO_LEFT_INDEX] == "-"):
+                while GO_LEFT_INDEX >= 0 and (
+                    text[GO_LEFT_INDEX] == " " or text[GO_LEFT_INDEX] == "-"
+                ):
                     if text[GO_LEFT_INDEX] == "-":
                         has_left_hyphen = True
                     GO_LEFT_INDEX -= 1
-                
+
                 # look RIGHT of the matched substring
 
                 GO_RIGHT_INDEX = R
 
-                while GO_RIGHT_INDEX < len(text) and (text[GO_RIGHT_INDEX] == " " or text[GO_RIGHT_INDEX] == "-"):
+                while GO_RIGHT_INDEX < len(text) and (
+                    text[GO_RIGHT_INDEX] == " " or text[GO_RIGHT_INDEX] == "-"
+                ):
 
                     if text[GO_RIGHT_INDEX] == "-":
                         has_right_hyphen = True
                     GO_RIGHT_INDEX += 1
 
-                look_around_string = text[GO_LEFT_INDEX+1:GO_RIGHT_INDEX]
+                look_around_string = text[GO_LEFT_INDEX + 1 : GO_RIGHT_INDEX]
 
                 if has_left_hyphen or has_right_hyphen:
                     hypen_substrings.append(look_around_string)
             L += 1
 
     for hyphen_substring in hypen_substrings:
-        replacement_string = f" {hyphen_substring.replace('-', '').replace(' ', '')} " 
-        text = text.replace(hyphen_substring, replacement_string) 
+        replacement_string = f" {hyphen_substring.replace('-', '').replace(' ', '')} "
+        text = text.replace(hyphen_substring, replacement_string)
 
     text = text.strip()
 
     return text
 
+
 # -----------------------------------------------------------------------------------------------
 # ---- Set of simple replacement functions for replacing words in strings ----
 # -----------------------------------------------------------------------------------------------
 
+
 def _replace_and_with_hyphen(match):
     # Replace "and" and "&" with hyphens
     return match.replace("and", "-").replace("&", "-")
-    
+
+
 def _replace_to_or_with_hyphen(match):
     # Replace "and" and "&" with hyphens
     return match.replace("to", "-").replace("or", "-")
+
 
 def _replace_to_with_hyphen(match):
     # Replace "to" with hyphen
     return match.replace("to", "-")
 
+
 def _replace_or_with_hyphen(match):
     # Replace "or" with hyphen
     return match.replace("or", "-")
 
+
 # replace all instances of multiple hypens (which can be separated by whitespaces) in a string with a single hypen
 def replace_multiple_hyphens(string: str) -> str:
-    return re.sub(r'[-\s]+', '-', string)
+    return re.sub(r"[-\s]+", "-", string)
+
 
 # -----------------------------------------------------------------------------------------------
 # ---- Removes any extrawhitespaces from a string makes the string single spaced ----
 # -----------------------------------------------------------------------------------------------
+
 
 def _remove_extra_whitespaces(input_string: str) -> str:
     """Remove extra whitespaces from a string and return the string with only single whitespaces."""
     # ingredient = re.sub(r'\s+', ' ', ingredient).strip() # remove any extra whitespace
     return " ".join(input_string.split())
 
+
 # -----------------------------------------------------------------------------------------------
 # ---- Functions for parsing parenthesis content / quantity unit regex functions ----
 # -----------------------------------------------------------------------------------------------
 def _extract_quantities_only(input_string: str) -> list:
-
     """From a string get all quantities if they exist WITHOUT units
     Useful for just getting quantities if there are no units associated with them (e.g. "chicken breast (5)")
     Args:
@@ -657,8 +735,8 @@ def _extract_quantities_only(input_string: str) -> list:
 
     return quantities
 
-def _extract_quantity_unit_pairs(input_string: str) -> list[tuple]:
 
+def _extract_quantity_unit_pairs(input_string: str) -> list[tuple]:
     """From a string get all sets of quantity/units
     Useful for getting quantity/units pairings from a string (e.g. "1 cup of chopped chicken breast")
     Args:
@@ -666,7 +744,7 @@ def _extract_quantity_unit_pairs(input_string: str) -> list[tuple]:
     Returns:
         list: A list of tuples containing the quantity and unit
     """
-    
+
     if not isinstance(input_string, str):
         raise ValueError("Invalid input. Input must be a string.")
 
@@ -688,7 +766,9 @@ def _extract_quantity_unit_pairs(input_string: str) -> list[tuple]:
         # print(f"String after number match: '{str_after_number_match}'")
 
         # _regex_patterns.ALL_NUMBERS.findall(after_approx_match)
-        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(str_after_number_match)
+        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(
+            str_after_number_match
+        )
 
         if not nearest_unit_search:
             continue
@@ -697,15 +777,15 @@ def _extract_quantity_unit_pairs(input_string: str) -> list[tuple]:
 
         current_result.append(closest_unit)
         quantity_unit_pairs.append(tuple(current_result))
-    
+
     return quantity_unit_pairs
     # return [tuple(i) for i in quantity_unit_pairs]
 
-def _extract_equivalent_quantity_units(input_string: str) -> list[tuple]:
 
+def _extract_equivalent_quantity_units(input_string: str) -> list[tuple]:
     """From a string get all sets of quantity/units preceeded by "approximate" strings, (e.g. "about", "approximately", "around", etc.)
-    
-    Useful for getting instances where there is a quantity and unit in parenthesis that is 
+
+    Useful for getting instances where there is a quantity and unit in parenthesis that is
     an approximation of the quantity and unit in the main ingredient string (e.g. "1 cup of chopped chicken breast (about 12 ounces)")
 
     Args:
@@ -722,7 +802,9 @@ def _extract_equivalent_quantity_units(input_string: str) -> list[tuple]:
 
     # regex_patterns = _regex_patterns.IngredientTools()
 
-    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.finditer(input_string)
+    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.finditer(
+        input_string
+    )
 
     approximate_triplets = []
 
@@ -734,51 +816,66 @@ def _extract_equivalent_quantity_units(input_string: str) -> list[tuple]:
         # print(f"Start: {start} | End: {end}")
         # print(f"Input String: '{input_string}'")
         current_result = []
-        
-        current_result.append(match_string) # add the approximate string to the result
 
-        str_after_approx_match = input_string[end:] # string after the approximate match
+        current_result.append(match_string)  # add the approximate string to the result
+
+        str_after_approx_match = input_string[
+            end:
+        ]  # string after the approximate match
 
         # _regex_patterns.ALL_NUMBERS.findall(after_approx_match)
-        nearest_number_search = _regex_patterns.ALL_NUMBERS.search(str_after_approx_match) # search for the nearest number after the approximate string
+        nearest_number_search = _regex_patterns.ALL_NUMBERS.search(
+            str_after_approx_match
+        )  # search for the nearest number after the approximate string
 
         if not nearest_number_search:
             # print(f"No number found after approximate match")
             continue
 
-        closest_number = nearest_number_search.group() # the actual matching number string
+        closest_number = (
+            nearest_number_search.group()
+        )  # the actual matching number string
         # print(f"Closest Number: '{closest_number}'")
-        current_result.append(closest_number) # add the number to the result
-        
-        # string after the number 
-        str_after_number_match = str_after_approx_match[nearest_number_search.end():] # string after the number match
+        current_result.append(closest_number)  # add the number to the result
 
-        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(str_after_number_match) # search for the nearest unit after the number
+        # string after the number
+        str_after_number_match = str_after_approx_match[
+            nearest_number_search.end() :
+        ]  # string after the number match
 
-        if not nearest_unit_search: # if we don't find a unit after the number, we skip this triplet
+        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(
+            str_after_number_match
+        )  # search for the nearest unit after the number
+
+        if (
+            not nearest_unit_search
+        ):  # if we don't find a unit after the number, we skip this triplet
             # print(f"No unit found after approximate match")
             continue
 
-        closest_unit = nearest_unit_search.group() # the actual matching unit string
+        closest_unit = nearest_unit_search.group()  # the actual matching unit string
         # print(f"Closest Unit: '{closest_unit}'")
 
-        current_result.append(closest_unit) # add the unit to the result
+        current_result.append(closest_unit)  # add the unit to the result
         # approximate_triplets.append(current_result) # add the triplet to the list of approximate triplets
-        approximate_triplets.append(tuple(current_result)) # add the triplet to the list of approximate triplets
-    
+        approximate_triplets.append(
+            tuple(current_result)
+        )  # add the triplet to the list of approximate triplets
 
     # look for trailing approximate strings
-    trailing_approx_strings = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(input_string)
+    trailing_approx_strings = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(
+        input_string
+    )
 
     # if we didn't get any [approximate, quantity, unit] triplets, but we did get a trailing approximate strings
-    # check the string again for quantity unit pairs and 
+    # check the string again for quantity unit pairs and
     # add the trailing approximate string to the beginning of each pair
     # This will help handle the following case:
     #       "(12 ounces approximately)"
     if not approximate_triplets and trailing_approx_strings:
         # print(f"Trailing Approximate Strings: {trailing_approx_strings}")
         trailing_approx_string = trailing_approx_strings[0]
-        
+
         quantity_unit_pairs = _extract_quantity_unit_pairs(input_string)
 
         for pair in quantity_unit_pairs:
@@ -787,9 +884,10 @@ def _extract_equivalent_quantity_units(input_string: str) -> list[tuple]:
             # pair.append(trailing_approx_string)
         # [i.append(trailing_approx_string) for i in quantity_unit_pairs]
         # print()
-    
+
     # return [tuple(i) for i in approximate_triplets]
     return approximate_triplets
+
 
 def _is_approximate_quantity_only_parenthesis(input_string: str) -> bool:
     """Check if a string is an approximate quantity only parenthesis (e.g. "(about 12)")"""
@@ -802,26 +900,28 @@ def _is_approximate_quantity_only_parenthesis(input_string: str) -> bool:
     if not isinstance(input_string, str):
         return False
 
-    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(input_string)
-    quantity_matches           = _regex_patterns.ALL_NUMBERS.findall(input_string)
-    unit_matches               = _regex_patterns.UNITS_PATTERN.findall(input_string)
+    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(
+        input_string
+    )
+    quantity_matches = _regex_patterns.ALL_NUMBERS.findall(input_string)
+    unit_matches = _regex_patterns.UNITS_PATTERN.findall(input_string)
 
     has_approximate_string = True if approximate_string_matches else False
-    has_quantity           = True if quantity_matches else False
-    has_unit               = True if unit_matches else False
+    has_quantity = True if quantity_matches else False
+    has_unit = True if unit_matches else False
 
     if has_unit:
         return False
-    
+
     approximate_and_quantity_only = has_approximate_string and has_quantity
 
     return approximate_and_quantity_only
 
-def _extract_equivalent_quantity_only(input_string: str) -> list[tuple]:
 
+def _extract_equivalent_quantity_only(input_string: str) -> list[tuple]:
     """From a string get all sets of quantity/units preceeded by "approximate" strings, (e.g. "about", "approximately", "around", etc.)
-    
-    Useful for getting instances where there is a quantity and unit in parenthesis that is 
+
+    Useful for getting instances where there is a quantity and unit in parenthesis that is
     an approximation of the quantity and unit in the main ingredient string (e.g. "1 cup of chopped chicken breast (about 12 ounces)")
 
     Args:
@@ -841,8 +941,10 @@ def _extract_equivalent_quantity_only(input_string: str) -> list[tuple]:
 
     # regex_patterns = _regex_patterns.IngredientTools()
 
-    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.finditer(input_string)
-    
+    approximate_string_matches = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.finditer(
+        input_string
+    )
+
     unit_matches = _regex_patterns.UNITS_PATTERN.findall(input_string)
     has_units = True if unit_matches else False
 
@@ -859,51 +961,66 @@ def _extract_equivalent_quantity_only(input_string: str) -> list[tuple]:
         # print(f"Start: {start} | End: {end}")
         # print(f"Input String: '{input_string}'")
         current_result = []
-        
-        current_result.append(match_string) # add the approximate string to the result
 
-        str_after_approx_match = input_string[end:] # string after the approximate match
+        current_result.append(match_string)  # add the approximate string to the result
+
+        str_after_approx_match = input_string[
+            end:
+        ]  # string after the approximate match
 
         # _regex_patterns.ALL_NUMBERS.findall(after_approx_match)
-        nearest_number_search = _regex_patterns.ALL_NUMBERS.search(str_after_approx_match) # search for the nearest number after the approximate string
+        nearest_number_search = _regex_patterns.ALL_NUMBERS.search(
+            str_after_approx_match
+        )  # search for the nearest number after the approximate string
 
         if not nearest_number_search:
             # print(f"No number found after approximate match")
             continue
 
-        closest_number = nearest_number_search.group() # the actual matching number string
+        closest_number = (
+            nearest_number_search.group()
+        )  # the actual matching number string
         # print(f"Closest Number: '{closest_number}'")
-        current_result.append(closest_number) # add the number to the result
-        
-        # string after the number 
-        str_after_number_match = str_after_approx_match[nearest_number_search.end():] # string after the number match
+        current_result.append(closest_number)  # add the number to the result
 
-        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(str_after_number_match) # search for the nearest unit after the number
+        # string after the number
+        str_after_number_match = str_after_approx_match[
+            nearest_number_search.end() :
+        ]  # string after the number match
 
-        if not nearest_unit_search: # if we don't find a unit after the number, we skip this triplet
+        nearest_unit_search = _regex_patterns.UNITS_PATTERN.search(
+            str_after_number_match
+        )  # search for the nearest unit after the number
+
+        if (
+            not nearest_unit_search
+        ):  # if we don't find a unit after the number, we skip this triplet
             # print(f"No unit found after approximate match")
             continue
 
-        closest_unit = nearest_unit_search.group() # the actual matching unit string
+        closest_unit = nearest_unit_search.group()  # the actual matching unit string
         # print(f"Closest Unit: '{closest_unit}'")
 
-        current_result.append(closest_unit) # add the unit to the result
+        current_result.append(closest_unit)  # add the unit to the result
         # approximate_triplets.append(current_result) # add the triplet to the list of approximate triplets
-        approximate_triplets.append(tuple(current_result)) # add the triplet to the list of approximate triplets
-    
+        approximate_triplets.append(
+            tuple(current_result)
+        )  # add the triplet to the list of approximate triplets
 
     # look for trailing approximate strings
-    trailing_approx_strings = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(input_string)
+    trailing_approx_strings = _regex_patterns.APPROXIMATE_STRINGS_PATTERN.findall(
+        input_string
+    )
 
     # if we didn't get any [approximate, quantity, unit] triplets, but we did get a trailing approximate strings
-    # check the string again for quantity unit pairs and 
+    # check the string again for quantity unit pairs and
     # add the trailing approximate string to the beginning of each pair
     # This will help handle the following case:
     #       "(12 ounces approximately)"
     if not approximate_triplets and trailing_approx_strings:
         # print(f"Trailing Approximate Strings: {trailing_approx_strings}")
         trailing_approx_string = trailing_approx_strings[0]
-        
+
         quantity_unit_pairs = _extract_quantity_unit_pairs(input_string)
 
         for pair in quantity_unit_pairs:
@@ -912,13 +1029,14 @@ def _extract_equivalent_quantity_only(input_string: str) -> list[tuple]:
             # pair.append(trailing_approx_string)
         # [i.append(trailing_approx_string) for i in quantity_unit_pairs]
         # print()
-    
+
     # return [tuple(i) for i in approximate_triplets]
     return approximate_triplets
 
 
 # pattern = regex_patterns.QUANTITY_DASH_QUANTITY
 # replacement_function=None
+
 
 # TODO: Deprecated --> DELETE
 def _fractions_to_decimals(input_string) -> str:
@@ -929,7 +1047,7 @@ def _fractions_to_decimals(input_string) -> str:
     Returns:
         str: The updated string with fractions replaced by their decimal equivalents.
     """
-    fraction_pattern = re.compile(r'\d*\s*/\s*\d+')  # regex pattern for fractions
+    fraction_pattern = re.compile(r"\d*\s*/\s*\d+")  # regex pattern for fractions
     # print("Parsing fractions")
     fractions = re.findall(fraction_pattern, input_string)
 
@@ -943,8 +1061,8 @@ def _fractions_to_decimals(input_string) -> str:
 
     return input_string
 
-def _extract_parenthesis(ingredient: str) -> str:
 
+def _extract_parenthesis(ingredient: str) -> str:
     """Extract the content of the parenthesis in an ingredient string.
     Stack based approach to extract the content of the parenthesis in an ingredient string, probably deprecated...
     """
@@ -954,7 +1072,7 @@ def _extract_parenthesis(ingredient: str) -> str:
         # cleaned_ingredient = cleaned_ingredient.strip()
         # cleaned_ingredient = _remove_extra_whitespaces(cleaned_ingredient)
         return ingredient, []
-    
+
     stack = []
     parenthesis_list = []
 
@@ -973,17 +1091,19 @@ def _extract_parenthesis(ingredient: str) -> str:
             stack.pop()
 
         stack.append(char)
-    
+
     return ["".join(stack), parenthesis_list]
+
 
 # ingredient = "1 rice with (2 cups of (444) water) and (another) (())love"
 # _extract_parenthesis(ingredient) # output: ['1 rice with  and  love', ['444', '2 cups of  water', 'another', '', '']]
 
+
 def _split_by_parenthesis(ingredient: str) -> list:
-    """ Split an ingredient string by parenthesis and return the cleaned ingredient and the content of the parenthesis.
+    """Split an ingredient string by parenthesis and return the cleaned ingredient and the content of the parenthesis.
     If the parenthesis is invalid, return the original ingredient string. and an empty list.
-    If there are valid parenthesis, the function pulls out the parenthesis and unnests any nested parenthesis within 
-    those parenthesis, it will the return the ingredient with the parenthesis extracted and 
+    If there are valid parenthesis, the function pulls out the parenthesis and unnests any nested parenthesis within
+    those parenthesis, it will the return the ingredient with the parenthesis extracted and
     a list of the unnested parenthesis content.
     Args:
         ingredient (str): The ingredient string to split by parenthesis.
@@ -1008,11 +1128,11 @@ def _split_by_parenthesis(ingredient: str) -> list:
     cleaned_ingredient = []
 
     for char in ingredient:
-        if char == '(':
+        if char == "(":
             nested_level += 1
             if nested_level > 1:
                 cleaned_ingredient.append(char)
-        elif char == ')':
+        elif char == ")":
             if nested_level > 1:
                 cleaned_ingredient.append(char)
             nested_level -= 1
@@ -1020,27 +1140,31 @@ def _split_by_parenthesis(ingredient: str) -> list:
                 parenthesis = []
                 while stack:
                     parenthesis.append(stack.pop())
-                parenthesis_list.append(''.join(parenthesis[::-1]))
+                parenthesis_list.append("".join(parenthesis[::-1]))
         elif nested_level == 0:
             cleaned_ingredient.append(char)
         elif nested_level > 0:
             stack.append(char)
 
-    cleaned_ingredient = ''.join(cleaned_ingredient)
+    cleaned_ingredient = "".join(cleaned_ingredient)
 
     cleaned_ingredient = cleaned_ingredient.replace("(", "").replace(")", "")
     cleaned_ingredient = cleaned_ingredient.strip()
     cleaned_ingredient = _remove_extra_whitespaces(cleaned_ingredient)
 
-    parenthesis_list = [_remove_extra_whitespaces(p.replace("(", "").replace(")", "").strip()) for p in parenthesis_list]
+    parenthesis_list = [
+        _remove_extra_whitespaces(p.replace("(", "").replace(")", "").strip())
+        for p in parenthesis_list
+    ]
     # parenthesis_list = [p for p in parenthesis_list if p]
 
     return [cleaned_ingredient, parenthesis_list]
 
+
 def _is_valid_parenthesis(string: str) -> bool:
     if not isinstance(string, str):
         raise ValueError("Invalid input. Ingredient must be a string.")
-    
+
     count = 0
     for char in string:
         if char == "(":
@@ -1050,6 +1174,7 @@ def _is_valid_parenthesis(string: str) -> bool:
             if count < 0:
                 return False
     return count == 0
+
 
 def _remove_parenthesis_from_str(ingredient: str) -> str:
     """Remove parenthesis and their content from an ingredient string.
@@ -1062,9 +1187,9 @@ def _remove_parenthesis_from_str(ingredient: str) -> str:
     if not isinstance(ingredient, str):
         raise ValueError("Invalid input. Ingredient must be a string.")
 
-    MATCH_PARENTHESIS = re.compile(r'\([^()]*\)|\[[^][]*]|[{}]')
+    MATCH_PARENTHESIS = re.compile(r"\([^()]*\)|\[[^][]*]|[{}]")
     while MATCH_PARENTHESIS.search(ingredient):  # While regex matches the string
-        ingredient = MATCH_PARENTHESIS.sub('', ingredient)  # Remove the matches
+        ingredient = MATCH_PARENTHESIS.sub("", ingredient)  # Remove the matches
 
     ingredient = ingredient.replace("(", "").replace(")", "").strip()
     ingredient = _remove_extra_whitespaces(ingredient)
@@ -1072,42 +1197,43 @@ def _remove_parenthesis_from_str(ingredient: str) -> str:
 
 
 def _find_and_remove(string: str, pattern: re.Pattern) -> str:
-        """Find and remove all matches of a pattern from a string.
-        Args:
-            string (str): The string to search for matches in
-            pattern (re.Pattern): The pattern to search for in the string
-        Returns:
-            str: The modified string with all matches removed
-        """
+    """Find and remove all matches of a pattern from a string.
+    Args:
+        string (str): The string to search for matches in
+        pattern (re.Pattern): The pattern to search for in the string
+    Returns:
+        str: The modified string with all matches removed
+    """
 
-        pattern_iter = pattern.finditer(string)
+    pattern_iter = pattern.finditer(string)
 
-        offset = 0
+    offset = 0
 
-        for match in pattern_iter:
-            match_string    = match.group()
-            replacement_str = ""
+    for match in pattern_iter:
+        match_string = match.group()
+        replacement_str = ""
 
-            # Get the start and end of the match and the modified start and end positions given the offset
-            start, end = match.start(), match.end()
-            modified_start = start + offset
-            modified_end = end + offset
+        # Get the start and end of the match and the modified start and end positions given the offset
+        start, end = match.start(), match.end()
+        modified_start = start + offset
+        modified_end = end + offset
 
-            # Construct the modified string with the replacement applied
-            string = string[:modified_start] + str(replacement_str) + string[modified_end:]
-            # self.standardized_ingredient = self.standardized_ingredient[:modified_start] + str(replacement_str) + self.standardized_ingredient[modified_end:]
+        # Construct the modified string with the replacement applied
+        string = string[:modified_start] + str(replacement_str) + string[modified_end:]
+        # self.standardized_ingredient = self.standardized_ingredient[:modified_start] + str(replacement_str) + self.standardized_ingredient[modified_end:]
 
-            # Update the offset for subsequent removals # TODO: this is always 0 because we're removing the match, probably just remove...
-            offset += len(str(replacement_str)) - (end - start)
-            # print(f"""
-            # Match string: {match_string}
-            # -> Match: {match_string} at positions {start}-{end}
-            # --> Modified start/end match positions: {modified_start}-{modified_end}
-            # ---> Modified string: {string}""")
-        
-        string = string.strip()
+        # Update the offset for subsequent removals # TODO: this is always 0 because we're removing the match, probably just remove...
+        offset += len(str(replacement_str)) - (end - start)
+        # print(f"""
+        # Match string: {match_string}
+        # -> Match: {match_string} at positions {start}-{end}
+        # --> Modified start/end match positions: {modified_start}-{modified_end}
+        # ---> Modified string: {string}""")
 
-        return string
+    string = string.strip()
+
+    return string
+
 
 def _find_and_replace_casual_quantities(ingredient: str) -> str:
     """
@@ -1118,41 +1244,48 @@ def _find_and_replace_casual_quantities(ingredient: str) -> str:
     pattern_iter = _regex_patterns.CASUAL_QUANTITIES_PATTERN.finditer(ingredient)
 
     for match in pattern_iter:
-        match_string    = match.group()
+        match_string = match.group()
 
         # Get the start and end of the match and the modified start and end positions given the offset
         start, end = match.start(), match.end()
         modified_start = start + offset
         modified_end = end + offset
 
-        replacement_str = _constants.CASUAL_QUANTITIES[match_string] 
+        replacement_str = _constants.CASUAL_QUANTITIES[match_string]
 
         # Construct the modified string with the replacement applied
-        ingredient = ingredient[:modified_start] + str(replacement_str) + ingredient[modified_end:]
+        ingredient = (
+            ingredient[:modified_start]
+            + str(replacement_str)
+            + ingredient[modified_end:]
+        )
 
-        # Update the offset for subsequent removals 
+        # Update the offset for subsequent removals
         offset += len(str(replacement_str)) - (end - start)
 
     return ingredient
 
+
 def _find_and_replace_prefixed_number_words(ingredient: str) -> str:
-    """ Replace prefixed number words with their corresponding numerical values in the parsed ingredient 
+    """Replace prefixed number words with their corresponding numerical values in the parsed ingredient
     Strings like "twenty five" are replaced with "25", or "thirty-two" is replaced with "32"
 
     """
-    number_words_iter = _regex_patterns.PREFIXED_NUMBER_WORDS_GROUPS.finditer(ingredient)
+    number_words_iter = _regex_patterns.PREFIXED_NUMBER_WORDS_GROUPS.finditer(
+        ingredient
+    )
 
     offset = 0
 
     for match in number_words_iter:
-        
+
         if match:
             start, end = match.start(), match.end()
 
             match_string = match.group()
             prefix_word = match.group(1)
             number_word = match.group(2)
-            
+
             prefix_value = _constants.NUMBER_PREFIX_WORDS.get(prefix_word, 0)
             number_value = _constants.NUMBER_WORDS.get(number_word, 0)
 
@@ -1163,7 +1296,11 @@ def _find_and_replace_prefixed_number_words(ingredient: str) -> str:
             modified_end = end + offset
 
             # Construct the modified string with the replacement applied
-            ingredient = ingredient[:modified_start] + str(combined_value) + ingredient[modified_end:]
+            ingredient = (
+                ingredient[:modified_start]
+                + str(combined_value)
+                + ingredient[modified_end:]
+            )
             # ingredient = ingredient[:modified_start] + str(combined_value) + ingredient[modified_end:]
 
             # Update the offset for subsequent replacements
@@ -1180,7 +1317,8 @@ def _find_and_replace_prefixed_number_words(ingredient: str) -> str:
 
     return ingredient
 
-def _find_and_replace_number_words(ingredient:str) -> str:
+
+def _find_and_replace_number_words(ingredient: str) -> str:
     """
     Replace number words with their corresponding numerical values in the parsed ingredient.
     """
@@ -1191,8 +1329,9 @@ def _find_and_replace_number_words(ingredient:str) -> str:
         # print statement if word is found in ingredient and replaced
         if pattern.search(ingredient):
             ingredient = pattern.sub(regex_data[0], ingredient)
-    
+
     return ingredient
+
 
 def _clean_html_and_unicode(ingredient: str) -> str:
     """Unescape fractions from HTML code coded fractions to unicode fractions."""
@@ -1205,6 +1344,7 @@ def _clean_html_and_unicode(ingredient: str) -> str:
         ingredient = ingredient.replace(unicode_fraction, f" {decimal_fraction}")
 
     return ingredient
+
 
 # def replace_number_followed_by_inch_symbol(ingredient: str) -> str:
 #     """Replace numbers followed by the inch symbol with the word 'inch' in the ingredient string.
@@ -1230,7 +1370,8 @@ def _clean_html_and_unicode(ingredient: str) -> str:
 
 #     return ingredient
 
-def _replace_number_followed_by_inch_symbol(ingredient: str ) -> str:
+
+def _replace_number_followed_by_inch_symbol(ingredient: str) -> str:
     """
     Find inch symbols (i.e. " or ”) in the ingredient string and replace them with the word "inch".
     """
@@ -1240,7 +1381,7 @@ def _replace_number_followed_by_inch_symbol(ingredient: str ) -> str:
 
     for key, pattern in _regex_patterns.NUMBER_WITH_INCH_SYMBOL_MAP.items():
         pattern_iter = pattern.finditer(ingredient)
-        
+
         offset = 0
         for match in pattern_iter:
             match_string = match.group()
@@ -1250,11 +1391,16 @@ def _replace_number_followed_by_inch_symbol(ingredient: str ) -> str:
 
             replacement_str = match_string.replace(key, "inch")
 
-            ingredient = ingredient[:modified_start] + str(replacement_str) + ingredient[modified_end:]
+            ingredient = (
+                ingredient[:modified_start]
+                + str(replacement_str)
+                + ingredient[modified_end:]
+            )
 
             offset += len(str(replacement_str)) - (end - start)
 
     return ingredient
+
 
 def _extract_dimensions(ingredient: str) -> list[str, list[str]]:
     """Extract dimension units from an ingredient string.
@@ -1265,7 +1411,10 @@ def _extract_dimensions(ingredient: str) -> list[str, list[str]]:
     """
     # ingredient = 'fruit (4.67inch long x 2.75inch dia)'
     dimension_units = []
-    for dimension_unit, pattern in _regex_patterns.QUANTITY_WITH_DIMENSION_UNITS_MAP.items():
+    for (
+        dimension_unit,
+        pattern,
+    ) in _regex_patterns.QUANTITY_WITH_DIMENSION_UNITS_MAP.items():
         # print(f"Dimension Unit: {dimension_unit}")
 
         # match_iter = pattern.finditer(ingredient)
@@ -1276,10 +1425,11 @@ def _extract_dimensions(ingredient: str) -> list[str, list[str]]:
             # print(f"Finding and removing {matches} from ingredient")
             ingredient = _find_and_remove(ingredient, pattern)
             dimension_units.extend(matches)
-        
+
         # print(f"Ingredient: {ingredient}\nDimension Units: {dimension_units}\n")
 
     return [ingredient, dimension_units]
+
 
 # def _extract_dimensions(ingredient: str) -> list[str, list[str]]:
 #     """Extract dimension units from an ingredient string.
@@ -1301,15 +1451,16 @@ def _extract_dimensions(ingredient: str) -> list[str, list[str]]:
 #             # print(f"Finding and removing {matches} from ingredient")
 #             ingredient = _find_and_remove(ingredient, pattern)
 #             dimension_units.extend(matches)
-        
+
 #         # print(f"Ingredient: {ingredient}\nDimension Units: {dimension_units}\n")
 
 #     return [ingredient, dimension_units]
 
+
 def _split_dimension_ranges(ingredient: str) -> list[str, list[str]]:
     """Split an ingredient string by any quantity dimension unit separated by an 'by' character.
     (i.e. "2 steaks, 3 inches by 4 inches thick" -> ("2 steaks, thick", "3 inches by 4 inches")
-    
+
     Args:
         ingredient (str): The ingredient string to parse.
     Returns:
@@ -1326,11 +1477,11 @@ def _split_dimension_ranges(ingredient: str) -> list[str, list[str]]:
 
         # quantities from first quantity/unit pair
         quantity1 = match.group(1)
-        unit1     = match.group(2)
+        unit1 = match.group(2)
 
         # quantities from second quantity/unit pair
         quantity2 = match.group(3)
-        unit2     = match.group(4)
+        unit2 = match.group(4)
 
         unit1_is_dimension = unit1 in _constants.DIMENSION_UNITS_SET
         unit2_is_dimension = unit2 in _constants.DIMENSION_UNITS_SET
@@ -1343,10 +1494,11 @@ def _split_dimension_ranges(ingredient: str) -> list[str, list[str]]:
 
     return [ingredient, dimension_units]
 
+
 def _split_single_unit_dimension_ranges(ingredient: str) -> list[str]:
     """Split an ingredient string by any quantity dimension unit separated by an 'by' character.
     (i.e. "2 steaks, 3 inches by 4 inches thick" -> ("2 steaks, thick", "3 inches by 4 inches")
-    
+
     Args:
         ingredient (str): The ingredient string to parse.
     Returns:
@@ -1354,7 +1506,9 @@ def _split_single_unit_dimension_ranges(ingredient: str) -> list[str]:
     """
 
     # ingredient = "2 steaks, 3 x 4 inches thick"
-    single_dimension_unit_iter = _regex_patterns.SINGLE_DIMENSION_UNIT_RANGES.finditer(ingredient)
+    single_dimension_unit_iter = _regex_patterns.SINGLE_DIMENSION_UNIT_RANGES.finditer(
+        ingredient
+    )
 
     dimension_units = []
 
@@ -1368,7 +1522,7 @@ def _split_single_unit_dimension_ranges(ingredient: str) -> list[str]:
 
         # quantities from second quantity/unit pair
         quantity2 = match.group(2)
-        unit2     = match.group(3)
+        unit2 = match.group(3)
 
         # unit1_is_dimension = unit1 in _constants.DIMENSION_UNITS_SET
         unit2_is_dimension = unit2 in _constants.DIMENSION_UNITS_SET
@@ -1382,6 +1536,7 @@ def _split_single_unit_dimension_ranges(ingredient: str) -> list[str]:
         # print()
 
     return [ingredient, dimension_units]
+
 
 def _separate_dimensions(ingredient: str) -> str:
     """
@@ -1400,6 +1555,7 @@ def _separate_dimensions(ingredient: str) -> str:
 
     return [ingredient, dimensions]
 
+
 def _remove_x_separators(ingredient: str) -> str:
     """
     Remove "x" separators from the ingredient string and replace with whitespace
@@ -1412,12 +1568,13 @@ def _remove_x_separators(ingredient: str) -> str:
     # ingredient = "5 x cartons of eggs (3 x 4 inches)"
 
     def replace_x(match):
-        return match.group().replace('x', ' ').replace('X', ' ')
+        return match.group().replace("x", " ").replace("X", " ")
 
     # Replace "x"/"X" separators with whitespace
     ingredient = _regex_patterns.X_AFTER_NUMBER.sub(replace_x, ingredient)
 
     return ingredient
+
 
 def _remove_repeat_units_in_ranges(ingredient) -> str:
     """
@@ -1426,11 +1583,13 @@ def _remove_repeat_units_in_ranges(ingredient) -> str:
     "2 oz - 3 oz diced tomatoes" -> "2 - 3 oz diced tomatoes"
     "3cups-4 cups of cat food" -> "3 - 4 cups of cat food"
     """
-    
+
     ingredient = ingredient.lower()
 
     # get any strings that match the pattern 1<unitA> - 2<unitA> or 1<unitA> - 2<unitB>
-    repeat_unit_matches = _regex_patterns.QUANTITY_UNIT_DASH_QUANTITY_UNIT.finditer(ingredient)
+    repeat_unit_matches = _regex_patterns.QUANTITY_UNIT_DASH_QUANTITY_UNIT.finditer(
+        ingredient
+    )
     # repeat_unit_matches = _regex_patterns.REPEAT_UNIT_RANGES.finditer(ingredient) # NOTE: old regex pattern (riskier)
 
     for match in repeat_unit_matches:
@@ -1440,22 +1599,23 @@ def _remove_repeat_units_in_ranges(ingredient) -> str:
 
         # quantities from first quantity/unit pair
         quantity1 = match.group(1)
-        unit1     = match.group(2)
+        unit1 = match.group(2)
 
         # quantities from second quantity/unit pair
         quantity2 = match.group(3)
-        unit2     = match.group(4)
+        unit2 = match.group(4)
 
         # if the units are the same, replace the original string with the quantities and units
         if unit1 == unit2:
-            ingredient = ingredient.replace(original_string, f"{quantity1} - {quantity2} {unit1}")
+            ingredient = ingredient.replace(
+                original_string, f"{quantity1} - {quantity2} {unit1}"
+            )
 
-    return ingredient 
+    return ingredient
 
 
-def _get_gram_weight(food:str, quantity:str, unit:str, method:str = "dice") -> dict:
-
-    """ Get the gram weight of a given quantity of food item.
+def _get_gram_weight(food: str, quantity: str, unit: str, method: str = "dice") -> dict:
+    """Get the gram weight of a given quantity of food item.
     Args:
         food (str): The food item to convert.
         quantity (Union[str, int, float]): The quantity of the food item.
@@ -1465,11 +1625,7 @@ def _get_gram_weight(food:str, quantity:str, unit:str, method:str = "dice") -> d
     """
 
     if not unit:
-        return {
-            "gram_weight" : None,
-            "min_gram_weight" : None,
-            "max_gram_weight" : None
-        }
+        return {"gram_weight": None, "min_gram_weight": None, "max_gram_weight": None}
 
     if quantity is None:
         quantity = "1"
@@ -1484,20 +1640,22 @@ def _get_gram_weight(food:str, quantity:str, unit:str, method:str = "dice") -> d
     method = method.lower()
 
     if method not in ["levenshtein", "jaccard", "dice"]:
-        raise ValueError("Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'.")
-    
+        raise ValueError(
+            "Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'."
+        )
+
     if not isinstance(quantity, (str, int, float)):
         raise ValueError("'quantity' must be a string, integer, or float")
-    
+
     if not isinstance(unit, str):
         raise ValueError("'unit' must be a string")
 
     quantity = float(quantity)
-    
-    gram_weight     = None
+
+    gram_weight = None
     min_gram_weight = None
     max_gram_weight = None
-    
+
     unit = unit.lower()
 
     # weight check
@@ -1505,30 +1663,46 @@ def _get_gram_weight(food:str, quantity:str, unit:str, method:str = "dice") -> d
         gram_weight = _convert_weights_to_grams(quantity, unit)
 
         return {
-            "gram_weight" : str(round(gram_weight, 2)) if gram_weight else None,
-            "min_gram_weight" : str(round(min_gram_weight, 2)) if min_gram_weight else None,
-            "max_gram_weight" : str(round(max_gram_weight, 2)) if max_gram_weight else None
-            }
-    
+            "gram_weight": str(round(gram_weight, 2)) if gram_weight else None,
+            "min_gram_weight": (
+                str(round(min_gram_weight, 2)) if min_gram_weight else None
+            ),
+            "max_gram_weight": (
+                str(round(max_gram_weight, 2)) if max_gram_weight else None
+            ),
+        }
+
     # volume check
     if unit in _constants.VOLUME_UNIT_TO_STANDARD_VOLUME_UNIT:
-        gram_values_map = _convert_volume_to_grams(food, quantity, unit, method)  
+        gram_values_map = _convert_volume_to_grams(food, quantity, unit, method)
 
         return {
-            "gram_weight" : str(round(gram_values_map["gram_weight"], 2)) if gram_values_map["gram_weight"] else None,
-            "min_gram_weight" : str(round(gram_values_map["min_gram_weight"], 2)) if gram_values_map["min_gram_weight"] else None,
-            "max_gram_weight" : str(round(gram_values_map["max_gram_weight"], 2)) if gram_values_map["max_gram_weight"] else None
-            }
+            "gram_weight": (
+                str(round(gram_values_map["gram_weight"], 2))
+                if gram_values_map["gram_weight"]
+                else None
+            ),
+            "min_gram_weight": (
+                str(round(gram_values_map["min_gram_weight"], 2))
+                if gram_values_map["min_gram_weight"]
+                else None
+            ),
+            "max_gram_weight": (
+                str(round(gram_values_map["max_gram_weight"], 2))
+                if gram_values_map["max_gram_weight"]
+                else None
+            ),
+        }
 
     # if the given unit was not a weight or volume unit, return None for all of the gram weights
     return {
-        "gram_weight" : str(round(gram_weight, 2)) if gram_weight else None,
-        "min_gram_weight" : str(round(min_gram_weight, 2)) if min_gram_weight else None,
-        "max_gram_weight" : str(round(max_gram_weight, 2)) if max_gram_weight else None
-        }
-    
+        "gram_weight": str(round(gram_weight, 2)) if gram_weight else None,
+        "min_gram_weight": str(round(min_gram_weight, 2)) if min_gram_weight else None,
+        "max_gram_weight": str(round(max_gram_weight, 2)) if max_gram_weight else None,
+    }
 
-def _convert_weights_to_grams(quantity: Union[str, int, float], unit:str) -> str:
+
+def _convert_weights_to_grams(quantity: Union[str, int, float], unit: str) -> str:
     """
     Get the weight of a given quantity of units in grams
     If the given unit is not in the set of standard weight units (e.g. "pounds", "ounces", "grams", "kilograms", "milligrams", "micrograms") or an abbreviated form,
@@ -1542,30 +1716,30 @@ def _convert_weights_to_grams(quantity: Union[str, int, float], unit:str) -> str
 
     if not isinstance(quantity, (str, int, float)):
         raise ValueError("'quantity' must be a string, integer, or float")
-    
+
     if not isinstance(unit, str):
         raise ValueError("'unit' must be a string")
-    
+
     if isinstance(quantity, str):
         quantity = float(quantity)
 
     if unit in _constants.WEIGHT_UNIT_TO_STANDARD_WEIGHT_UNIT:
-        
-        standard_unit     = _constants.WEIGHT_UNIT_TO_STANDARD_WEIGHT_UNIT[unit]
+
+        standard_unit = _constants.WEIGHT_UNIT_TO_STANDARD_WEIGHT_UNIT[unit]
         conversion_factor = _constants.GRAM_CONVERSION_FACTORS[standard_unit]
 
         gram_weight = quantity * conversion_factor
 
         return gram_weight
-    
+
     return None
 
 
-def _convert_volumes_to_milliliters(quantity: Union[str, int, float], unit:str) -> str:
+def _convert_volumes_to_milliliters(quantity: Union[str, int, float], unit: str) -> str:
     """
     Get the volume of a given quantity of units in milliliters
-    If the given unit is not in the set of standard volume units (e.g. "teaspoons", "tablespoons", 
-    "fluid ounces", "cups", "pints", "quarts", "gallons", "milliliters", "liters") or an abbreviated form, 
+    If the given unit is not in the set of standard volume units (e.g. "teaspoons", "tablespoons",
+    "fluid ounces", "cups", "pints", "quarts", "gallons", "milliliters", "liters") or an abbreviated form,
     then the function returns None.
     Args:
         quantity (Union[str, int, float]): The quantity of the food item. Can be a string, float, or integer (e.g. "1.0", 1, 1.0)
@@ -1577,26 +1751,28 @@ def _convert_volumes_to_milliliters(quantity: Union[str, int, float], unit:str) 
 
     if not isinstance(quantity, (str, int, float)):
         raise ValueError("'quantity' must be a string, integer, or float")
-    
+
     if not isinstance(unit, str):
         raise ValueError("'unit' must be a string")
-    
+
     if isinstance(quantity, str):
         quantity = float(quantity)
 
     if unit in _constants.VOLUME_UNIT_TO_STANDARD_VOLUME_UNIT:
-        
-        standard_unit     = _constants.VOLUME_UNIT_TO_STANDARD_VOLUME_UNIT[unit]
+
+        standard_unit = _constants.VOLUME_UNIT_TO_STANDARD_VOLUME_UNIT[unit]
         conversion_factor = _constants.MILLILITER_CONVERSION_FACTORS[standard_unit]
 
         milliliter_volume = quantity * conversion_factor
 
         return milliliter_volume
-    
+
     return None
 
-def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: str, method:str = "levenshtein") -> dict:
 
+def _convert_volume_to_grams(
+    food: str, quantity: Union[str, int, float], unit: str, method: str = "levenshtein"
+) -> dict:
     """
     Convert a volume measurement to a weight measurement in grams.
     Args:
@@ -1616,19 +1792,21 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
 
     if not isinstance(method, str):
         raise ValueError("'method' must be a string")
-    
+
     method = method.lower()
 
     if method not in ["levenshtein", "jaccard", "dice"]:
-        raise ValueError("Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'.")
+        raise ValueError(
+            "Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'."
+        )
 
-    fuzzy_matcher =  _get_fuzzy_matcher(method)
+    fuzzy_matcher = _get_fuzzy_matcher(method)
 
     milliliter_quantity = _convert_volumes_to_milliliters(quantity, unit)
 
     # print(f"Looking for categories and densities for:\n > '{food}'")
     # no_match_string = "no match found in FOOD_CATALOG"
-    
+
     # try to get the food groups for the given food...
     food_groups = _constants.FOOD_CATALOG.get(food, None)
     # food_groups = _constants.FOOD_CATALOG.get(food, no_match_string)
@@ -1644,45 +1822,49 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
             food_groups = [food_group, food_group]
 
     # print(f"Categories for '{food}':\n--> '{food_groups}'")
-            
-    # Case when we get a real match in the FOOD_CATALOG, 
+
+    # Case when we get a real match in the FOOD_CATALOG,
     # then we can just use the corresponding densities for the matched food
     if food_groups:
-    # if food_groups != no_match_string:
+        # if food_groups != no_match_string:
         # print(f"Found exact category match:\n '{food}' >>> '{food_groups}'")
         primary_category, secondary_category = food_groups
 
-        # try to get the density values for the given primary category food group, 
+        # try to get the density values for the given primary category food group,
         # if that fails try to get the density values for the secondary category food group
         # and all else fails, use the default density map
         if primary_category in _constants.FOOD_DENSITY_BY_GROUP:
-            density_map = _constants.FOOD_DENSITY_BY_GROUP.get(primary_category, _constants.DEFAULT_DENSITY_MAP)
+            density_map = _constants.FOOD_DENSITY_BY_GROUP.get(
+                primary_category, _constants.DEFAULT_DENSITY_MAP
+            )
         elif secondary_category in _constants.FOOD_DENSITY_BY_GROUP:
-            density_map = _constants.FOOD_DENSITY_BY_GROUP.get(secondary_category, _constants.DEFAULT_DENSITY_MAP)
+            density_map = _constants.FOOD_DENSITY_BY_GROUP.get(
+                secondary_category, _constants.DEFAULT_DENSITY_MAP
+            )
         else:
             density_map = _constants.DEFAULT_DENSITY_MAP
-            
-        # try to get the density values for the given primary category food group, 
+
+        # try to get the density values for the given primary category food group,
 
         # print(f"Using density values for category:\n > '{density_map['category']}'")
 
-        density     = density_map.get("density_g_per_ml", 1)
+        density = density_map.get("density_g_per_ml", 1)
         min_density = density_map.get("min_density_g_per_ml", 0.9)
         max_density = density_map.get("max_density_g_per_ml", 1.1)
 
         # if primary_density and secondary_density:
-            # print(" > Both densities are available")
+        # print(" > Both densities are available")
         # print(f"Primary density: {primary_density}\nSecondary density: {secondary_density}")
 
-        gram_weight     = milliliter_quantity * density
+        gram_weight = milliliter_quantity * density
         min_gram_weight = milliliter_quantity * min_density
         max_gram_weight = milliliter_quantity * max_density
-        
+
         return {
-            "gram_weight" : gram_weight, 
-            "min_gram_weight" : min_gram_weight,
-            "max_gram_weight" : max_gram_weight
-            }
+            "gram_weight": gram_weight,
+            "min_gram_weight": min_gram_weight,
+            "max_gram_weight": max_gram_weight,
+        }
 
     # However, if we do NOT get a match in the FOOD_CATALOG, we will have to do a fuzzy match between our given food
     # and all of the foods and determine the closet match and use the density of that food group (FOOD_DENSITY_BY_GROUP)
@@ -1696,10 +1878,10 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
 
         # find the closeness from the given food to each food in the current category
         # and extract that food and its value, to stash the top matched food and its score for each category
-        scores =  {i: round(fuzzy_matcher(food, i), 2) for i in food_set}
-        top_score_key = max(scores, key=scores.get) 
+        scores = {i: round(fuzzy_matcher(food, i), 2) for i in food_set}
+        top_score_key = max(scores, key=scores.get)
         top_score_value = scores[top_score_key] if top_score_key else 0
-        
+
         # NOTE: keep track of the food with the highest similarity score for each category
         top_scoring_foods[category] = [top_score_key, top_score_value]
         # print(f" - Top score key/value:\n ----> '{top_score_key} ({scores[top_score_key]})'\n")
@@ -1708,7 +1890,7 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
         # max_similarity = max([round(_utils.score_sentence_similarity(food, i), 2) for i in food_set])
 
         similarity_scores[category] = max_similarity
-        
+
     # get the key that has the highest similarity score in the dictionary of similarity scores
     best_category_match = max(similarity_scores, key=similarity_scores.get)
 
@@ -1720,15 +1902,17 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
     min_density = 0.9
     max_density = 1.1
 
-    try: 
+    try:
         # print(f"Successful best effort category match: \n '{food}' >>> '{best_category_match}'")
-        gram_map    = _constants.FOOD_DENSITY_BY_GROUP[best_category_match]
-        density     = gram_map["density_g_per_ml"]
+        gram_map = _constants.FOOD_DENSITY_BY_GROUP[best_category_match]
+        density = gram_map["density_g_per_ml"]
         max_density = gram_map["max_density_g_per_ml"]
         min_density = gram_map["min_density_g_per_ml"]
         # print(f"Using density value of:\n > '{density} g/ml'")
     except:
-        warnings.warn(f"No good food denstity match was found, defaulting to the density of water (1 g/ml)")
+        warnings.warn(
+            f"No good food denstity match was found, defaulting to the density of water (1 g/ml)"
+        )
 
     # # NOTE: old way of catching if no good match was made or the matched category does not exist / density is <= 0
     # if ((best_category_match not in _constants.FOOD_DENSITY_BY_GROUP) or \
@@ -1737,16 +1921,17 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
     #     density = 1
     # else:
     #     density = _constants.FOOD_DENSITY_BY_GROUP[best_category_match]["density_g_per_ml"]
-        
-    gram_weight     = density * milliliter_quantity
+
+    gram_weight = density * milliliter_quantity
     max_gram_weight = max_density * milliliter_quantity
     min_gram_weight = min_density * milliliter_quantity
 
     return {
-        "gram_weight" : gram_weight, 
-        "min_gram_weight" : min_gram_weight,
-        "max_gram_weight" : max_gram_weight, 
-        }
+        "gram_weight": gram_weight,
+        "min_gram_weight": min_gram_weight,
+        "max_gram_weight": max_gram_weight,
+    }
+
 
 # # ingredient = "1 1/2 cups of all purpose almond flour, grounded"
 # ingredient = "1 1/2 cups of chick nuggets, grounded"
@@ -1760,8 +1945,8 @@ def _convert_volume_to_grams(food: str, quantity: Union[str, int, float], unit: 
 # unit = slicer.standardized_unit if slicer.standardized_unit else slicer.unit
 # quantity = slicer.quantity
 
-def _check_food_for_easy_categorization(food:str) -> str:
 
+def _check_food_for_easy_categorization(food: str) -> str:
     """Check if the food can be easily categorized based on the food name.
     If it can, return the category. Otherwise, return just return None.
     Args:
@@ -1791,6 +1976,7 @@ def _check_food_for_easy_categorization(food:str) -> str:
 
     return category
 
+
 def _get_fuzzy_matcher(method: str) -> Callable:
     """
     Get the fuzzy string matching function based on the given method.
@@ -1804,15 +1990,18 @@ def _get_fuzzy_matcher(method: str) -> Callable:
     method = method.lower()
 
     if method not in ["levenshtein", "jaccard", "dice"]:
-        raise ValueError("Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'.")
+        raise ValueError(
+            "Invalid 'method'. Options are 'levenshtein', 'jaccard', or 'dice'."
+        )
 
     fuzzy_matchers = {
-        "levenshtein" : _levenshtein_similarity,
-        "jaccard" : _jaccard_similarity,
-        "dice" : _dice_coeff_similarity
-        }
+        "levenshtein": _levenshtein_similarity,
+        "jaccard": _jaccard_similarity,
+        "dice": _dice_coeff_similarity,
+    }
 
     return fuzzy_matchers[method]
+
 
 def _levenshtein_dist(str1: str, str2: str) -> int:
     matrix = [[float("inf")] * (len(str2) + 1) for i in range(len(str1) + 1)]
@@ -1829,17 +2018,19 @@ def _levenshtein_dist(str1: str, str2: str) -> int:
                 matrix[i][j] = matrix[i + 1][j + 1]
             else:
                 matrix[i][j] = 1 + min(
-                                    matrix[i + 1][j],    # delete
-                                    matrix[i][j + 1],     # isert 
-                                    matrix[i + 1][j + 1] # substitute
-                                    )
+                    matrix[i + 1][j],  # delete
+                    matrix[i][j + 1],  # isert
+                    matrix[i + 1][j + 1],  # substitute
+                )
     # levenstein distance == bottom right corner of matrix
     return matrix[0][0]
+
 
 def _levenshtein_similarity(str1, str2):
     distance = _levenshtein_dist(str1, str2)
     max_len = max(len(str1), len(str2))
     return 1 - (distance / max_len)
+
 
 def _jaccard_similarity(str1, str2):
     set1 = set(str1)
@@ -1847,6 +2038,7 @@ def _jaccard_similarity(str1, str2):
     intersection = len(set1.intersection(set2))
     union = len(set1.union(set2))
     return intersection / union
+
 
 # Credit: to recipe_scrapers (hhruvs) GitHub repository for the following code
 def _dice_coeff_similarity(first: str, second: str) -> float:
@@ -1885,6 +2077,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
     intersection = first_bigrams & second_bigrams
 
     return 2.0 * len(intersection) / (len(first_bigrams) + len(second_bigrams))
+
 
 # def _split_dimension_unit_x_ranges(ingredient: str) -> tuple[str]:
 #     """Split an ingredient string by any quantity dimension unit separated by an 'x' character.
@@ -1943,7 +2136,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 # def _split_dimension_unit_by_ranges(ingredient: str) -> tuple[str]:
 #     """Split an ingredient string by any quantity dimension unit separated by an 'by' character.
 #     (i.e. "2 steaks, 3 inches by 4 inches thick" -> ("2 steaks, thick", "3 inches by 4 inches")
-    
+
 #     Args:
 #         ingredient (str): The ingredient string to parse.
 #     Returns:
@@ -2012,9 +2205,9 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 
 #         start, end = search_ranges.start(), search_ranges.end()
 #         match_string = search_ranges.group()
-        
+
 #         left_range, right_range = match_string.split("-")
-        
+
 #         left_range = left_range.strip()
 #         right_range = right_range.strip()
 
@@ -2026,19 +2219,19 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 
 #         first_number  = float(_utils._fraction_str_to_decimal(left_range).strip())
 #         second_number = float(_utils._fraction_str_to_decimal(right_range).strip())
-        
+
 #         range_average = f" {_utils._make_int_or_float_str(str((first_number + second_number) / 2))} "
 #         self.standardized_ingredient = self.standardized_ingredient[:start] + range_average + self.standardized_ingredient[end:]
 
 #         search_ranges = _regex_patterns.QUANTITY_DASH_QUANTITY.search(self.standardized_ingredient)
 #         # search_ranges = _regex_patterns.QUANTITY_DASH_QUANTITY_GROUPS.search(ingredient)
-    
+
 #     print(f"All ranges have been updated: {self.standardized_ingredient}") if self.debug else None
 
 #     self.standardized_ingredient = self.standardized_ingredient.strip()
 
 #     return
-    
+
 # def _avg_ranges(self) -> None:
 #     """
 #     Replace ranges of numbers with their average in the parsed ingredient.
@@ -2046,10 +2239,10 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #     "1-2 oz" -> "1.5 oz"
 #     "1 - 2 ft" -> "1.5 ft"
 #     """
-    
+
 #     all_ranges = re.finditer(_regex_patterns.QUANTITY_DASH_QUANTITY, self.standardized_ingredient)
 
-#     # initialize offset and replacement index values for updating the ingredient string, 
+#     # initialize offset and replacement index values for updating the ingredient string,
 #     # these will be used to keep track of the position of the match in the string
 #     offset = 0
 
@@ -2066,10 +2259,10 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #         range_values = re.findall(_regex_patterns.QUANTITY_DASH_QUANTITY, match.group())
 
 #         print(f"Range Values: {range_values}") if self.debug else None
-        
+
 #         # split the range values into a list of lists
 #         split_range_values = [i.split("-") for i in range_values]
-        
+
 #         print(f"  >>> Split Range Values: {split_range_values}") if self.debug else None
 #         # print() if self.debug else None
 
@@ -2084,7 +2277,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #         modified_end = end + offset
 
 #         print(f"Replacing {match.group()} with '{range_average}'...") if self.debug else None
-        
+
 #         # Construct the modified string with the replacement applied
 #         self.standardized_ingredient = self.standardized_ingredient[:modified_start] + str(range_average) + self.standardized_ingredient[modified_end:]
 #         # ingredient = ingredient[:modified_start] + str(range_average) + ingredient[modified_end:]
@@ -2092,7 +2285,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #         # Update the offset for subsequent replacements
 #         offset += len(range_average) - (end - start)
 
-#     return 
+#     return
 
 # # import re
 # NUMBER_WITH_INCH_SYMBOL = re.compile(r'(?:\d*\.\d+|\d+\s*/\s*\d+|\d+)\s*\"')
@@ -2141,7 +2334,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #         # print(f"Pattern Iter: {pattern_iter}")
 #         # all_matches = pattern.findall(ingredient)
 #         # print(f"All Matches: {all_matches}")
-        
+
 #         offset = 0
 #         for match in pattern_iter:
 #             match_string = match.group()
@@ -2170,9 +2363,9 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 #         Returns:
 #             str: The updated ingredient string
 #         """
-        
+
 #         # pattern = IngredientSlicer.regex.QUANTITY_DASH_QUANTITY
-        
+
 #         matches = pattern.findall(ingredient)
 
 #         # matched_ranges = [match.split("-") for match in matches]
@@ -2188,7 +2381,7 @@ def _dice_coeff_similarity(first: str, second: str) -> float:
 
 #         updated_ranges = [" - ".join([str(_fraction_str_to_decimal(i)) for i in match if i]) for match in matched_ranges]
 #         # updated_ranges = [" - ".join([str(int(i)) for i in match if i]) for match in matched_ranges]
-        
+
 #         # Create a dictionary to map the matched ranges to the updated ranges
 #         ranges_map = dict(zip(matches, updated_ranges))
 
