@@ -1,4 +1,4 @@
-# Authors: Angus Watters, Melissa Terry 
+# Authors: Angus Watters, Melissa Terry
 
 import re
 from typing import List, Dict, Any, Union, Tuple
@@ -10,13 +10,14 @@ import warnings
 from . import _utils
 from . import _regex_patterns
 from . import _constants
-from .standardizer._ingredient_standardizer import IngredientStandardizer 
-from .parser.ingredient_parser import IngredientParser 
+from .standardizer._ingredient_standardizer import IngredientStandardizer
+from .parser.ingredient_parser import IngredientParser
 
 # # local dev import statements
 # from ingredient_slicer import _utils
 # from ingredient_slicer import _regex_patterns
 # from ingredient_slicer import _constants
+
 
 class IngredientSlicer:
     """
@@ -27,24 +28,26 @@ class IngredientSlicer:
         debug (bool): Whether to print debug statements (default is False)
     """
 
-    def __init__(self, ingredient: str, debug = False):
-        self.ingredient          = ingredient
-        self.debug               = debug
+    def __init__(self, ingredient: str, debug=False):
+        self.ingredient = ingredient
+        self.debug = debug
 
-        self.parser = None 
+        self.parser = None
         self.parser = self._get_ingredient_parser(self.ingredient, self.debug)
 
-    def _get_ingredient_parser(self, ingredient : str, debug : bool = False) -> IngredientParser:
+    def _get_ingredient_parser(
+        self, ingredient: str, debug: bool = False
+    ) -> IngredientParser:
         if self.parser:
-            return self.parser 
+            return self.parser
 
         # Create an instance of IngredientStandardizer
-        parser = IngredientParser(ingredient, debug)    
-        return parser  
+        parser = IngredientParser(ingredient, debug)
+        return parser
 
     def to_json(self) -> Dict[str, Any]:
         return self.parser.to_json()
-    
+
     def standardized_ingredient(self) -> str:
         """
         Return the standardized ingredient string.
@@ -60,7 +63,7 @@ class IngredientSlicer:
             str: The food string.
         """
         return self.parser.parsed_data.food
-    
+
     def quantity(self) -> str:
         """
         Return the quantity string.
@@ -68,7 +71,7 @@ class IngredientSlicer:
             str: The quantity string.
         """
         return self.parser.parsed_data.quantity
-    
+
     def unit(self) -> str:
         """
         Return the unit string.
@@ -76,7 +79,7 @@ class IngredientSlicer:
             str: The unit string.
         """
         return self.parser.parsed_data.unit
-    
+
     def standardized_unit(self) -> str:
         """
         Return the standardized unit string.
@@ -84,7 +87,7 @@ class IngredientSlicer:
             str: The standardized unit string.
         """
         return self.parser.parsed_data.standardized_unit
-    
+
     def secondary_quantity(self) -> str:
         """
         Return the secondary quantity string.
@@ -92,7 +95,7 @@ class IngredientSlicer:
             str: The secondary quantity string.
         """
         return self.parser.parsed_data.secondary_quantity
-    
+
     def secondary_unit(self) -> str:
         """
         Return the secondary unit string.
@@ -100,7 +103,7 @@ class IngredientSlicer:
             str: The secondary unit string.
         """
         return self.parser.parsed_data.secondary_unit
-    
+
     def standardized_secondary_unit(self) -> str:
         """
         Return the standardized secondary unit string.
@@ -108,16 +111,20 @@ class IngredientSlicer:
             str: The standardized secondary unit string.
         """
         return self.parser.parsed_data.standardized_secondary_unit
-    
+
     def density(self) -> Union[str, float, int, None]:
         """
         Return the density of the given ingredient.
         Returns:
-            str: The density of the given ingredient. 
+            str: The density of the given ingredient.
         """
 
-        return self.parser.parsed_data.densities.get("density") if self.parser.parsed_data.densities else None
-    
+        return (
+            self.parser.parsed_data.densities.get("density")
+            if self.parser.parsed_data.densities
+            else None
+        )
+
     def gram_weight(self) -> str:
         """
         Return the estimated gram weight of the given ingredient.
@@ -125,7 +132,7 @@ class IngredientSlicer:
             str: The estimated gram weight of the given ingredient.
         """
         return self.parser.parsed_data.gram_weight
-    
+
     def min_gram_weight(self) -> str:
         """
         Return the estimated minimum gram weight of the given ingredient.
@@ -133,7 +140,7 @@ class IngredientSlicer:
             str: The estimated minimum gram weight of the given ingredient.
         """
         return self.parser.parsed_data.min_gram_weight
-    
+
     def max_gram_weight(self) -> str:
         """
         Return the estimated maximum gram weight of the given ingredient.
@@ -141,7 +148,7 @@ class IngredientSlicer:
             str: The estimated maximum gram weight of the given ingredient.
         """
         return self.parser.parsed_data.max_gram_weight
-    
+
     def prep(self) -> list:
         """
         Return the prep list.
@@ -149,7 +156,7 @@ class IngredientSlicer:
             list: The prep list.
         """
         return self.parser.parsed_data.prep
-    
+
     def size_modifiers(self) -> list:
         """
         Return the size modifiers list.
@@ -157,7 +164,7 @@ class IngredientSlicer:
             list: The size modifiers list.
         """
         return self.parser.parsed_data.size_modifiers
-    
+
     def dimensions(self) -> list:
         """
         Return the dimensions list.
@@ -165,7 +172,7 @@ class IngredientSlicer:
             list: The dimensions list.
         """
         return self.parser.parsed_data.dimensions
-    
+
     def is_required(self) -> bool:
         """
         Check if the ingredient is required or optional.
@@ -174,7 +181,7 @@ class IngredientSlicer:
         """
 
         return self.parser.parsed_data.is_required
-    
+
     def parenthesis_content(self) -> list[str]:
         """
         Get a list of the text within parenthesis
@@ -183,7 +190,7 @@ class IngredientSlicer:
         """
 
         return self.parser.parsed_data.parenthesis_content
-    
+
     def parsed_ingredient(self) -> dict:
         """
         Return the parsed ingredient dictionary.
@@ -192,7 +199,7 @@ class IngredientSlicer:
         """
 
         return self.parser.to_json()
-    
+
     def __str__(self) -> str:
         """
         Return a string representation of the IngredientSlicer object.

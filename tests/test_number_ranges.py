@@ -6,17 +6,18 @@ import re
 # from fractions import Fraction
 
 from ingredient_slicer import IngredientSlicer, _utils
+
 # from ingredient_slicer import _constants
 
 # _constants.SECONDARY_CATEGORIES
 # categories_to_ignore = [
 #                     # TODO: misc_changes
-#                     "miscellaneous_foods", 
+#                     "miscellaneous_foods",
 #                     "baked_goods",
-#                     "mixed_dishes", 
+#                     "mixed_dishes",
 #                     "beverages_non_alcoholic_including_soft_drinks_and_juices",
 #                     "tea_cacao_coffee_and_drinking_powders",
-#                     "wine_and_cider", 
+#                     "wine_and_cider",
 #                     "beer",
 #                     "spirits_and_liqueurs",
 #                     "snacks",
@@ -30,12 +31,12 @@ from ingredient_slicer import IngredientSlicer, _utils
 
 # categories_to_ignore = [
 #                     # TODO: misc_changes
-#                     "miscellaneous_foods", 
+#                     "miscellaneous_foods",
 #                     "baked_goods",
-#                     "mixed_dishes", 
+#                     "mixed_dishes",
 #                     "beverages_non_alcoholic_including_soft_drinks_and_juices",
 #                     "tea_cacao_coffee_and_drinking_powders",
-#                     "wine_and_cider", 
+#                     "wine_and_cider",
 #                     "beer",
 #                     "spirits_and_liqueurs",
 #                     "snacks",
@@ -45,344 +46,366 @@ from ingredient_slicer import IngredientSlicer, _utils
 # ---- Simple number ranges (whole numbers/decimals to whole numbers/decimals) ----
 # -------------------------------------------------------------------------------
 
+
 def test_simple_number_range_1():
-    slicer = IngredientSlicer("1-2 cups of sugar", debug = True)
+    slicer = IngredientSlicer("1-2 cups of sugar", debug=True)
     # slicer.parse()
     parsed = slicer.to_json()
 
-    assert parsed['quantity'] == "1.5"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["quantity"] == "1.5"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 def test_simple_number_range_2():
     slicer = IngredientSlicer("1-3 cups of sugar")
     # slicer.parse()
     parsed = slicer.to_json()
 
-    assert parsed['quantity'] == "2"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["quantity"] == "2"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 def test_simple_number_range_3():
     slicer = IngredientSlicer("1-1.5 cups of sugar")
     # slicer.parse()
     parsed = slicer.to_json()
 
-    assert parsed['quantity'] == "1.25"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["quantity"] == "1.25"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 def test_simple_number_range_4():
     slicer = IngredientSlicer("4-1/2 cups of sugar", debug=True)
     # slicer.parse()
     parsed = slicer.to_json()
 
-    assert parsed['quantity'] == "4.5"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["quantity"] == "4.5"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 # -------------------------------------------------------------------------------
 # ---- Fraction/Range tests ----
 # -------------------------------------------------------------------------------
-    
+
+
 def test_fraction_range_as_quantity_1():
     parse = IngredientSlicer("1-1/2 cup of sugar")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed['quantity'] == "1.5"
-    assert parsed['unit'] == 'cup'
-    assert parsed['is_required'] == True
+    assert parsed["quantity"] == "1.5"
+    assert parsed["unit"] == "cup"
+    assert parsed["is_required"] == True
+
 
 def test_fraction_range_as_quantity_2():
     parse = IngredientSlicer("1/2-1 cup of sugar")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed['quantity'] == "0.75"
-    assert parsed['unit'] == 'cup'
-    assert parsed['is_required'] == True
+    assert parsed["quantity"] == "0.75"
+    assert parsed["unit"] == "cup"
+    assert parsed["is_required"] == True
+
 
 # -------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------
 # ---- Unicode fraction/range tests ----
 # -------------------------------------------------------------------------------
-    
+
+
 def test_unicode_fraction_range_1():
     parse = IngredientSlicer("1-1½cup of sugar")
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '1.25 cup of sugar'
-    assert parsed['quantity'] == "1.25"
-    assert parsed['unit'] == 'cup'
-    assert parsed['is_required'] == True
+    assert parsed["standardized_ingredient"] == "1.25 cup of sugar"
+    assert parsed["quantity"] == "1.25"
+    assert parsed["unit"] == "cup"
+    assert parsed["is_required"] == True
+
 
 def test_unicode_fraction_range_2():
     parse = IngredientSlicer("1½-2cup of sugar")
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '1.75 cup of sugar'
-    assert parsed['quantity'] == "1.75"
-    assert parsed['unit'] == 'cup'
-    assert parsed['is_required'] == True
+    assert parsed["standardized_ingredient"] == "1.75 cup of sugar"
+    assert parsed["quantity"] == "1.75"
+    assert parsed["unit"] == "cup"
+    assert parsed["is_required"] == True
+
 
 def test_unicode_fraction_range_3():
     parse = IngredientSlicer("1½-2½cup of sugar", debug=False)
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '2 cup of sugar'
-    assert parsed['quantity'] == "2"
-    assert parsed['unit'] == 'cup'
-    assert parsed['is_required'] == True
+    assert parsed["standardized_ingredient"] == "2 cup of sugar"
+    assert parsed["quantity"] == "2"
+    assert parsed["unit"] == "cup"
+    assert parsed["is_required"] == True
 
 
 # -------------------------------------------------------------------------------
 # ---- Multinumber (space separated) tests ----
 # -------------------------------------------------------------------------------
 
+
 def test_multiple_multinumber_ranges_1():
     parse = IngredientSlicer("3 - 12 1/2 cups of sugar (optional)")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '7.75 cups of sugar'
-    assert parsed['quantity'] == "7.75"
-    assert parsed['unit'] == 'cups'
-    assert parsed['is_required'] == False
+    assert parsed["standardized_ingredient"] == "7.75 cups of sugar"
+    assert parsed["quantity"] == "7.75"
+    assert parsed["unit"] == "cups"
+    assert parsed["is_required"] == False
+
 
 def test_multiple_multinumber_ranges_2():
     parse = IngredientSlicer("3 - 12 1/2 cups of sugar (optional)")
     # parse.parse()
     parsed = parse.to_json()
     # 15.5/2
-    assert parsed["standardized_ingredient"] == '7.75 cups of sugar'
-    assert parsed['quantity'] == "7.75"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["standardized_ingredient"] == "7.75 cups of sugar"
+    assert parsed["quantity"] == "7.75"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == False
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == False
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 def test_multiple_multinumber_ranges_3():
     parse = IngredientSlicer("2 1/2 - 4  cups of sugar (optional)")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '3.25 cups of sugar'
-    assert parsed['quantity'] == "3.25"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["standardized_ingredient"] == "3.25 cups of sugar"
+    assert parsed["quantity"] == "3.25"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == False
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == False
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 # -------------------------------------------------------------------------------
 # ---- Test averaging  ----
 # -------------------------------------------------------------------------------
 
+
 def test_average_from_two_whole_numbers_1():
     parse = IngredientSlicer("1-2 cups of sugar")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '1.5 cups of sugar'
-    assert parsed['quantity'] == "1.5"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["standardized_ingredient"] == "1.5 cups of sugar"
+    assert parsed["quantity"] == "1.5"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 def test_average_from_two_whole_numbers_2():
     parse = IngredientSlicer("1-   8 tbsp of thickened cream")
     # parse.parse()
 
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '4.5 tbsp of thickened cream'
-    assert parsed['quantity'] == "4.5"
-    assert parsed['unit'] == 'tbsp'
-    assert parsed['standardized_unit'] == 'tablespoon'
-    
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["standardized_ingredient"] == "4.5 tbsp of thickened cream"
+    assert parsed["quantity"] == "4.5"
+    assert parsed["unit"] == "tbsp"
+    assert parsed["standardized_unit"] == "tablespoon"
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == ['thickened']
-    assert parsed['food'] == 'cream'
-    assert parsed['size_modifiers'] == []
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
+
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == ["thickened"]
+    assert parsed["food"] == "cream"
+    assert parsed["size_modifiers"] == []
+
 
 def test_average_from_two_whole_numbers_with_quantity_multiplier_1():
     parse = IngredientSlicer("15-20 oz large bananas, toasted (5)")
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '17.5 oz large bananas, toasted'
-    assert parsed['quantity'] == "87.5"
-    assert parsed['unit'] == 'oz'
-    assert parsed['standardized_unit'] == 'ounce'
+    assert parsed["standardized_ingredient"] == "17.5 oz large bananas, toasted"
+    assert parsed["quantity"] == "87.5"
+    assert parsed["unit"] == "oz"
+    assert parsed["standardized_unit"] == "ounce"
 
-    assert parsed['secondary_quantity'] == '17.5'
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == "17.5"
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == ['toasted']
-    assert parsed['food'] == 'bananas'
-    assert parsed['size_modifiers'] == ['large']
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == ["toasted"]
+    assert parsed["food"] == "bananas"
+    assert parsed["size_modifiers"] == ["large"]
+
 
 def test_average_from_two_whole_numbers_with_quantity_multiplier_2():
-    parse = IngredientSlicer("1-2 cherries, no pits, (2 ounces each)", debug = False)
+    parse = IngredientSlicer("1-2 cherries, no pits, (2 ounces each)", debug=False)
     # parse.parse()
     parsed = parse.to_json()
-    
-    assert parsed["standardized_ingredient"] == '1.5 cherries, no pits,'
-    assert parsed['quantity'] == "3"
-    assert parsed['unit'] == "ounces"
-    assert parsed['standardized_unit'] == "ounce"
 
-    assert parsed['secondary_quantity'] == '1.5'
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["standardized_ingredient"] == "1.5 cherries, no pits,"
+    assert parsed["quantity"] == "3"
+    assert parsed["unit"] == "ounces"
+    assert parsed["standardized_unit"] == "ounce"
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == [] # TODO: should be ['no pits']
-    assert parsed['food'] == 'cherries pits' # TODO: should be 'cherries'
+    assert parsed["secondary_quantity"] == "1.5"
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []  # TODO: should be ['no pits']
+    assert parsed["food"] == "cherries pits"  # TODO: should be 'cherries'
 
 
 # NOTE: this is a crazy scenario and lets hope this never really occurs in real life
 def test_average_from_three_whole_numbers_1():
-    parse = IngredientSlicer("1-3 or 4 cups of sugar", debug = False)
+    parse = IngredientSlicer("1-3 or 4 cups of sugar", debug=False)
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '3 cups of sugar'
-    assert parsed['quantity'] == "3"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["standardized_ingredient"] == "3 cups of sugar"
+    assert parsed["quantity"] == "3"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 # NOTE: this is a crazy scenario and lets hope this never really occurs in real life
 def test_average_from_four_whole_numbers_1():
-    parse = IngredientSlicer("1-3 or 10-20 cups of sugar", debug = False)
+    parse = IngredientSlicer("1-3 or 10-20 cups of sugar", debug=False)
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '13 cups of sugar'
-    assert parsed['quantity'] == "13"
-    assert parsed['unit'] == 'cups'
-    assert parsed['standardized_unit'] == 'cup'
+    assert parsed["standardized_ingredient"] == "13 cups of sugar"
+    assert parsed["quantity"] == "13"
+    assert parsed["unit"] == "cups"
+    assert parsed["standardized_unit"] == "cup"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'sugar'
-    assert parsed['size_modifiers'] == []
+    assert parsed["is_required"] == True
+    assert parsed["prep"] == []
+    assert parsed["food"] == "sugar"
+    assert parsed["size_modifiers"] == []
+
 
 # -------------------------------------------------------------------------------
 # ---- Test misleading number ranges ----
 # -------------------------------------------------------------------------------
 
+
 def test_misleading_number_ranges_1():
     parse = IngredientSlicer("1-1/2 tbsp of raw honey")
     # parse.parse()
     parsed = parse.to_json()
-    assert parsed["standardized_ingredient"] == '1.5 tbsp of raw honey'
-    assert parsed['quantity'] == "1.5"
-    assert parsed['unit'] == 'tbsp'
-    assert parsed['standardized_unit'] == 'tablespoon'
+    assert parsed["standardized_ingredient"] == "1.5 tbsp of raw honey"
+    assert parsed["quantity"] == "1.5"
+    assert parsed["unit"] == "tbsp"
+    assert parsed["standardized_unit"] == "tablespoon"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
+    assert parsed["is_required"] == True
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'raw honey'
-    assert parsed['size_modifiers'] == []
+    assert parsed["prep"] == []
+    assert parsed["food"] == "raw honey"
+    assert parsed["size_modifiers"] == []
+
 
 def test_misleading_number_ranges_2():
     parse = IngredientSlicer("1-1/2 to 3 tbsp, coconut oil")
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '2.25 tbsp, coconut oil'
-    assert parsed['quantity'] == "2.25"
-    assert parsed['unit'] == 'tbsp'
-    assert parsed['standardized_unit'] == 'tablespoon'
+    assert parsed["standardized_ingredient"] == "2.25 tbsp, coconut oil"
+    assert parsed["quantity"] == "2.25"
+    assert parsed["unit"] == "tbsp"
+    assert parsed["standardized_unit"] == "tablespoon"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
+    assert parsed["is_required"] == True
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'coconut oil'
-    assert parsed['size_modifiers'] == []
+    assert parsed["prep"] == []
+    assert parsed["food"] == "coconut oil"
+    assert parsed["size_modifiers"] == []
 
 
 def test_misleading_number_ranges_3():
@@ -390,20 +413,21 @@ def test_misleading_number_ranges_3():
     # parse.parse()
     parsed = parse.to_json()
 
-    assert parsed["standardized_ingredient"] == '6.625 tbsp, coconut oil'
-    assert parsed['quantity'] == "6.625"
-    assert parsed['unit'] == 'tbsp'
-    assert parsed['standardized_unit'] == 'tablespoon'
+    assert parsed["standardized_ingredient"] == "6.625 tbsp, coconut oil"
+    assert parsed["quantity"] == "6.625"
+    assert parsed["unit"] == "tbsp"
+    assert parsed["standardized_unit"] == "tablespoon"
 
-    assert parsed['secondary_quantity'] == None
-    assert parsed['secondary_unit'] == None
-    assert parsed['standardized_secondary_unit'] == None
+    assert parsed["secondary_quantity"] == None
+    assert parsed["secondary_unit"] == None
+    assert parsed["standardized_secondary_unit"] == None
 
-    assert parsed['is_required'] == True
+    assert parsed["is_required"] == True
 
-    assert parsed['prep'] == []
-    assert parsed['food'] == 'coconut oil'
-    assert parsed['size_modifiers'] == []
+    assert parsed["prep"] == []
+    assert parsed["food"] == "coconut oil"
+    assert parsed["size_modifiers"] == []
+
 
 #############################################################################################
 #####################################################################################################
@@ -460,8 +484,8 @@ def test_misleading_number_ranges_3():
 #         self.standard_ingredient = self.standard_ingredient[:match.start()] + str(updated_value) + self.standard_ingredient[match.end():]
 
 #         offset += len(updated_value) - (end - start)
-    
-#     return 
+
+#     return
 # def _find_and_remove_percentages(self) -> None:
 #         """
 #         Find and remove percentages from the ingredient string.
@@ -473,7 +497,7 @@ def test_misleading_number_ranges_3():
 #         # for match in percentage_matches:
 #         #     self.standard_ingredient = self.standard_ingredient.replace(match, "")
 #         ingredient = "1 cup of 2% heavy cream"
-        
+
 #         for key, pattern in IngredientSlicer.regex.PCT_REGEX_MAP.items():
 #             print(f"Key: {key}")
 #             pattern_iter = pattern.finditer(ingredient)
@@ -509,10 +533,10 @@ def test_misleading_number_ranges_3():
 #             # Construct the modified string with the replacement applied
 #             self.standard_ingredient = self.standard_ingredient[:modified_start] + str(replacement_str) + self.standard_ingredient[modified_end:]
 #             # ingredient = ingredient[:modified_start] + str(replacement_str) + ingredient[modified_end:]
-            
-#             # Update the offset for subsequent removals 
+
+#             # Update the offset for subsequent removals
 #             offset += len(str(replacement_str)) - (end - start)
-        
+
 #         return
 
 # def _find_and_replace_numbers_separated_by_add_numbers(self) -> None:
@@ -525,7 +549,7 @@ def test_misleading_number_ranges_3():
 #         """
 
 #         ingredient = "1 cup of 2% heavy cream"
-        
+
 #         for key, pattern in IngredientSlicer.regex.PCT_REGEX_MAP.items():
 #             pattern_iter = pattern.finditer(ingredient)
 #             for match in pattern_iter:
@@ -549,7 +573,7 @@ def test_misleading_number_ranges_3():
 #             updated_value = f" {self._make_int_or_float_str(str(first_number + second_number))} "
 #             self.standard_ingredient = self.standard_ingredient[:match.start()] + updated_value + self.standard_ingredient[match.end():]
 #             offset += len(updated_value) - (end - start)
-        
+
 #         return
 
 # #############################################################################################
@@ -614,7 +638,7 @@ def test_misleading_number_ranges_3():
 # parsed = parse.to_json()
 # parsed
 # TODO: Maybe implement this which makes sure to always reduce any SPACE_SEP_NUMBERS to a single number
-# TODO:  where possible and do this RECURSIVELY until there are no space separated numbers left. 
+# TODO:  where possible and do this RECURSIVELY until there are no space separated numbers left.
 # TODO: I've got to see/think if this is a risky approach, just need to narrow down the base case of the recursion...
 # ingredient = "1 1/2 1/4 cups of sugar"
 # while regex_map.SPACE_SEP_NUMBERS.findall(ingredient):
@@ -630,7 +654,7 @@ def test_misleading_number_ranges_3():
 
 # regex_map.print_matches(ingredient)
 # regex_map.print_matches("1.75 cups of sugar")
-    
+
 # ingredient = "1.5  - 5 - 10 tbsp, coconut oil"
 
 # IngredientSlicer.regex.print_matches(ingredient)
@@ -651,9 +675,9 @@ def test_misleading_number_ranges_3():
 
 #         start, end = search_ranges.start(), search_ranges.end()
 #         match_string = search_ranges.group()
-        
+
 #         left_range, right_range = match_string.split("-")
-        
+
 #         left_range = left_range.strip()
 #         right_range = right_range.strip()
 
@@ -665,13 +689,13 @@ def test_misleading_number_ranges_3():
 
 #         first_number  = float(_fraction_str_to_decimal(left_range).strip())
 #         second_number = float(_fraction_str_to_decimal(right_range).strip())
-        
+
 #         range_average = f" {_make_int_or_float_str(str((first_number + second_number) / 2))} "
 #         self.standard_ingredient = self.standard_ingredient[:start] + range_average + self.standard_ingredient[end:]
 
 #         search_ranges = IngredientSlicer.regex.QUANTITY_DASH_QUANTITY.search(self.standard_ingredient)
 #         # search_ranges = IngredientSlicer.regex.QUANTITY_DASH_QUANTITY_GROUPS.search(ingredient)
-    
+
 #     print(f"All ranges have been updated: {self.standard_ingredient}") if self.debug else None
 
 #     self.standard_ingredient = self.standard_ingredient.strip()
@@ -838,7 +862,7 @@ def test_misleading_number_ranges_3():
 #                 end += 1
 #                 print(f"----" * 5)
 
-#         # if we never got to another number, continue on 
+#         # if we never got to another number, continue on
 #         if not right_num:
 #             print(f"--> Skipping char: {char}")
 #             print(f"----> Didn't end up finding another number after {''.join(left_num)}")
@@ -910,14 +934,14 @@ def test_misleading_number_ranges_3():
 #                     end += 1
 #                 print(f"Found a decimal point, updated right number: {''.join(right_num)}")
 
-#             # if we never got to another number, continue on 
+#             # if we never got to another number, continue on
 #             if not right_num:
 #                 start += 1
 #                 print("Continuing to next character...")
 #                 print(f"===" * 5)
 #                 print()
 #                 continue
-            
+
 #             LEFT_RANGE = "".join(left_num)
 #             RIGHT_RANGE = "".join(right_num)
 
